@@ -1,6 +1,7 @@
 import {
   ref,
   uploadBytes,
+  uploadString,
   getDownloadURL,
   deleteObject,
   UploadResult,
@@ -17,6 +18,21 @@ export const storageService = {
     try {
       const storageRef = ref(storage, path);
       const uploadResult = await uploadBytes(storageRef, file, metadata);
+      return uploadResult;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Upload a data URL (base64) to Firebase Storage
+  uploadDataURL: async (
+    dataURL: string,
+    path: string,
+    metadata?: { contentType?: string }
+  ): Promise<UploadResult> => {
+    try {
+      const storageRef = ref(storage, path);
+      const uploadResult = await uploadString(storageRef, dataURL, 'data_url', metadata);
       return uploadResult;
     } catch (error) {
       throw error;
