@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { firestoreService } from "@/firebase/firestore";
 import { authService } from "@/firebase/auth";
+import type { EntryPoint } from "@/firebase/firestore";
 
 export async function GET(
     request: NextRequest,
@@ -16,21 +16,25 @@ export async function GET(
             );
         }
 
-        const compound = await firestoreService.compounds.getById(
+        const entryPoint = await firestoreService.read<EntryPoint>(
+            "entryPoints",
             (
                 await params
             ).id
         );
 
-        if (!compound) {
+        if (!entryPoint) {
             return NextResponse.json(
-                { error: "Compound not found" },
+                { error: "Entry point not found" },
                 { status: 404 }
             );
         }
 
-        // Verify the user owns this compound
-        if (compound.adminId !== currentUser.uid) {
+        // Verify the user owns the compound of this entry point
+        const compound = await firestoreService.compounds.getById(
+            entryPoint.compoundId
+        );
+        if (!compound || compound.adminId !== currentUser.uid) {
             return NextResponse.json(
                 { error: "Unauthorized" },
                 { status: 403 }
@@ -39,12 +43,15 @@ export async function GET(
 
         return NextResponse.json({
             success: true,
-            compound,
+            entryPoint,
         });
-    } catch (error: any) {
-        console.error("Get compound error:", error);
+    } catch (error: unknown) {
+        console.error("Get entry point error:", error);
         return NextResponse.json(
-            { error: error.message || "Failed to fetch compound" },
+            {
+                error:
+                    (error as Error).message || "Failed to fetch entry point",
+            },
             { status: 500 }
         );
     }
@@ -63,21 +70,25 @@ export async function PUT(
             );
         }
 
-        const compound = await firestoreService.compounds.getById(
+        const entryPoint = await firestoreService.read<EntryPoint>(
+            "entryPoints",
             (
                 await params
             ).id
         );
 
-        if (!compound) {
+        if (!entryPoint) {
             return NextResponse.json(
-                { error: "Compound not found" },
+                { error: "Entry point not found" },
                 { status: 404 }
             );
         }
 
-        // Verify the user owns this compound
-        if (compound.adminId !== currentUser.uid) {
+        // Verify the user owns the compound of this entry point
+        const compound = await firestoreService.compounds.getById(
+            entryPoint.compoundId
+        );
+        if (!compound || compound.adminId !== currentUser.uid) {
             return NextResponse.json(
                 { error: "Unauthorized" },
                 { status: 403 }
@@ -86,7 +97,7 @@ export async function PUT(
 
         const updateData = await request.json();
         await firestoreService.update(
-            "compounds",
+            "entryPoints",
             (
                 await params
             ).id,
@@ -95,12 +106,15 @@ export async function PUT(
 
         return NextResponse.json({
             success: true,
-            message: "Compound updated successfully",
+            message: "Entry point updated successfully",
         });
-    } catch (error: any) {
-        console.error("Update compound error:", error);
+    } catch (error: unknown) {
+        console.error("Update entry point error:", error);
         return NextResponse.json(
-            { error: error.message || "Failed to update compound" },
+            {
+                error:
+                    (error as Error).message || "Failed to update entry point",
+            },
             { status: 500 }
         );
     }
@@ -119,37 +133,44 @@ export async function DELETE(
             );
         }
 
-        const compound = await firestoreService.compounds.getById(
+        const entryPoint = await firestoreService.read<EntryPoint>(
+            "entryPoints",
             (
                 await params
             ).id
         );
 
-        if (!compound) {
+        if (!entryPoint) {
             return NextResponse.json(
-                { error: "Compound not found" },
+                { error: "Entry point not found" },
                 { status: 404 }
             );
         }
 
-        // Verify the user owns this compound
-        if (compound.adminId !== currentUser.uid) {
+        // Verify the user owns the compound of this entry point
+        const compound = await firestoreService.compounds.getById(
+            entryPoint.compoundId
+        );
+        if (!compound || compound.adminId !== currentUser.uid) {
             return NextResponse.json(
                 { error: "Unauthorized" },
                 { status: 403 }
             );
         }
 
-        await firestoreService.delete("compounds", (await params).id);
+        await firestoreService.delete("entryPoints", (await params).id);
 
         return NextResponse.json({
             success: true,
-            message: "Compound deleted successfully",
+            message: "Entry point deleted successfully",
         });
     } catch (error: unknown) {
-        console.error("Delete compound error:", error);
+        console.error("Delete entry point error:", error);
         return NextResponse.json(
-            { error: (error as Error).message || "Failed to delete compound" },
+            {
+                error:
+                    (error as Error).message || "Failed to delete entry point",
+            },
             { status: 500 }
         );
     }
