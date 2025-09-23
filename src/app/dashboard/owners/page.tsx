@@ -40,29 +40,31 @@ import {
     Trash2,
     Filter,
 } from "lucide-react";
-import { firestoreService, type Owner } from "@/firebase/firestore";
+import { firestoreService, type User } from "@/firebase/firestore";
+import { authService } from "@/firebase/auth";
 import { useCompound } from "@/contexts/CompoundContext";
 
 export default function OwnersPage() {
     const { selectedCompound } = useCompound();
-    const [owners, setOwners] = useState<Owner[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
-    const [newOwner, setNewOwner] = useState({
+    const [newUser, setNewUser] = useState({
         firstName: "",
         lastName: "",
         email: "",
         phone: "",
         propertyUnit: "",
+        type: "owner" as "owner" | "employee" | "manager",
         paymentStatus: "pending" as "paid" | "pending" | "overdue",
         lastPaymentDate: undefined as Timestamp | undefined,
         compoundId: selectedCompound?.id || "",
     });
 
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [editingOwner, setEditingOwner] = useState<Owner | null>(null);
+    const [editingUser, setEditingUser] = useState<User | null>(null);
 
     useEffect(() => {
         if (selectedCompound) {
@@ -75,11 +77,11 @@ export default function OwnersPage() {
 
         try {
             setLoading(true);
-            // Load owners for the selected compound only
-            const compoundOwners = await firestoreService.owners.getByCompound(
+            // Load users for the selected compound only
+            const compoundUsers = await firestoreService.users.getByCompound(
                 selectedCompound.id!
             );
-            setOwners(compoundOwners);
+            setUsers(compoundUsers);
         } catch (error) {
             console.error("Error loading owners data:", error);
         } finally {
@@ -87,35 +89,37 @@ export default function OwnersPage() {
         }
     };
 
-    const handleAddOwner = async (e: React.FormEvent) => {
+    const handleAddUser = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const ownerData: any = {
-                firstName: newOwner.firstName,
-                lastName: newOwner.lastName,
-                email: newOwner.email,
-                paymentStatus: newOwner.paymentStatus,
+            const userData: any = {
+                firstName: newUser.firstName,
+                lastName: newUser.lastName,
+                email: newUser.email,
+                paymentStatus: newUser.paymentStatus,
                 compoundId: selectedCompound?.id || "",
+                type: newUser.type,
                 isActive: true,
             };
 
-            if (newOwner.phone) {
-                ownerData.phone = newOwner.phone;
+            if (newUser.phone) {
+                userData.phone = newUser.phone;
             }
-            if (newOwner.propertyUnit) {
-                ownerData.propertyUnit = newOwner.propertyUnit;
+            if (newUser.propertyUnit) {
+                userData.propertyUnit = newUser.propertyUnit;
             }
-            if (newOwner.lastPaymentDate) {
-                ownerData.lastPaymentDate = newOwner.lastPaymentDate;
+            if (newUser.lastPaymentDate) {
+                userData.lastPaymentDate = newUser.lastPaymentDate;
             }
 
-            await firestoreService.owners.create(ownerData);
-            setNewOwner({
+            await firestoreService.users.create(userData);
+            setNewUser({
                 firstName: "",
                 lastName: "",
                 email: "",
                 phone: "",
                 propertyUnit: "",
+                type: "owner",
                 paymentStatus: "pending",
                 lastPaymentDate: undefined,
                 compoundId: selectedCompound?.id || "",
@@ -123,50 +127,43 @@ export default function OwnersPage() {
             setIsAddDialogOpen(false);
             loadData();
         } catch (error) {
-            console.error("Error adding owner:", error);
+            console.error("Error adding user:", error);
         }
     };
 
-    const openEditDialog = (owner: Owner) => {
-        setEditingOwner(owner);
+    const openEditDialog = (user: User) => {
+        setEditingUser(user);
         setIsEditDialogOpen(true);
     };
 
-    const handleUpdateOwner = async (e: React.FormEvent) => {
+    const handleUpdateUser = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!editingOwner?.id) return;
+        if (!editingUser?.id) return;
         try {
             const updateData: any = {
-                firstName: editingOwner.firstName,
-                lastName: editingOwner.lastName,
-                email: editingOwner.email,
-                paymentStatus: editingOwner.paymentStatus,
-                isActive: editingOwner.isActive,
+                firstName: editingUser.firstName,
+                lastName: editingUser.lastName,
+                email: editingUser.email,
+                paymentStatus: editingUser.paymentStatus,
+                isActive: editingUser.isActive,
             };
 
-            if (
-                editingOwner.phone !== undefined &&
-                editingOwner.phone !== null
-            ) {
-                updateData.phone = editingOwner.phone;
+            if (editingUser.phone !== undefined && editingUser.phone !== null) {
+                updateData.phone = editingUser.phone;
             }
             if (
-                editingOwner.propertyUnit !== undefined &&
-                editingOwner.propertyUnit !== null
+                editingUser.propertyUnit !== undefined &&
+                editingUser.propertyUnit !== null
             ) {
-                updateData.propertyUnit = editingOwner.propertyUnit;
+                updateData.propertyUnit = editingUser.propertyUnit;
             }
-            if (editingOwner.lastPaymentDate !== undefined) {
-                updateData.lastPaymentDate = editingOwner.lastPaymentDate;
+            if (editingUser.lastPaymentDate !== undefined) {
+                updateData.lastPaymentDate = editingUser.lastPaymentDate;
             }
 
-            await firestoreService.update(
-                "owners",
-                editingOwner.id,
-                updateData
-            );
+            await firestoreService.update("users", editingUser.id, updateData);
             setIsEditDialogOpen(false);
-            setEditingOwner(null);
+            setEditingUser(null);
             loadData();
         } catch (error) {
             console.error("Error updating owner:", error);
@@ -175,16 +172,97 @@ export default function OwnersPage() {
 
     const handleCSVImport = async (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: Implement CSV import functionality
-        console.log("CSV import functionality to be implemented");
+
+        // Check if user is logged in
+        const currentUser = authService.getCurrentUser();
+        if (!currentUser) {
+            alert("Please log in first");
+            return;
+        }
+
+        // Check if compound is selected
+        if (!selectedCompound) {
+            alert("Please select a compound first");
+            return;
+        }
+
+        const formData = new FormData(e.target as HTMLFormElement);
+        const file = formData.get("csv-file") as File;
+
+        if (!file) {
+            alert("Please select a CSV file");
+            return;
+        }
+
+        // Validate file type
+        if (!file.name.toLowerCase().endsWith(".csv")) {
+            alert("Please select a valid CSV file");
+            return;
+        }
+
+        // Validate file size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            alert("File size must be less than 10MB");
+            return;
+        }
+
+        try {
+            // Get the current user
+            const currentUser = authService.getCurrentUser();
+            if (!currentUser) {
+                alert("Please log in first");
+                return;
+            }
+
+            const uploadFormData = new FormData();
+            uploadFormData.append("file", file);
+            uploadFormData.append("compoundId", selectedCompound?.id || "");
+            uploadFormData.append("userId", currentUser.uid);
+
+            console.log("Frontend: Sending to API:");
+            console.log("- File:", file.name, "Size:", file.size);
+            console.log("- CompoundId:", selectedCompound?.id);
+            console.log("- UserId:", currentUser.uid);
+
+            const response = await fetch("/api/owners/import", {
+                method: "POST",
+                body: uploadFormData,
+            });
+
+            console.log("Frontend: API response status:", response.status);
+
+            const result = await response.json();
+
+            console.log("Frontend: API response:", result);
+
+            if (result.success) {
+                alert(`Successfully imported ${result.count} users`);
+                loadData();
+            } else {
+                //let errorMessage = "Import failed";
+                //if (result.errors && result.errors.length > 0) {
+                //    errorMessage += `:\n${result.errors
+                //        .map((err: any) => `Row ${err.row}: ${err.error}`)
+                //        .join("\n")}`;
+                //} else if (result.error) {
+                //    errorMessage += `: ${result.error}`;
+                //}
+                //console.error("Frontend: Import error:", errorMessage);
+                //alert(errorMessage);
+            }
+        } catch (error) {
+            console.error("CSV import error:", error);
+            alert("Failed to import CSV file");
+        }
+
         setIsImportDialogOpen(false);
     };
 
-    const filteredOwners = owners.filter((owner) => {
+    const filteredUsers = users.filter((user) => {
         const matchesSearch =
-            owner.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            owner.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            owner.email.toLowerCase().includes(searchTerm.toLowerCase());
+            user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchTerm.toLowerCase());
 
         return matchesSearch;
     });
@@ -208,10 +286,11 @@ export default function OwnersPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                        Owners
+                        Users
                     </h1>
                     <p className="text-slate-600 dark:text-slate-400">
-                        Manage property owners and their access credentials
+                        Manage property users (owners, employees, managers) and
+                        their access credentials
                     </p>
                 </div>
                 <div className="flex gap-2">
@@ -227,14 +306,12 @@ export default function OwnersPage() {
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>
-                                    Import Owners from CSV
-                                </DialogTitle>
+                                <DialogTitle>Import Users from CSV</DialogTitle>
                                 <DialogDescription>
-                                    Upload a CSV file with owner information.
-                                    The file should include columns for:
-                                    firstName, lastName, email, phone,
-                                    propertyUnit, and compoundId.
+                                    Upload a CSV file with user information. The
+                                    file should include columns for: firstName,
+                                    lastName, email, phone, propertyUnit, and
+                                    type (owner/employee/manager).
                                 </DialogDescription>
                             </DialogHeader>
                             <form
@@ -245,6 +322,7 @@ export default function OwnersPage() {
                                     <Label htmlFor="csv-file">CSV File</Label>
                                     <Input
                                         id="csv-file"
+                                        name="csv-file"
                                         type="file"
                                         accept=".csv"
                                         required
@@ -260,7 +338,7 @@ export default function OwnersPage() {
                                     >
                                         Cancel
                                     </Button>
-                                    <Button type="submit">Import Owners</Button>
+                                    <Button type="submit">Import Users</Button>
                                 </div>
                             </form>
                         </DialogContent>
@@ -273,19 +351,18 @@ export default function OwnersPage() {
                         <DialogTrigger asChild>
                             <Button>
                                 <Plus className="h-4 w-4 mr-2" />
-                                Add Owner
+                                Add User
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Add New Owner</DialogTitle>
+                                <DialogTitle>Add New User</DialogTitle>
                                 <DialogDescription>
-                                    Enter the details for the new property
-                                    owner.
+                                    Enter the details for the new property user.
                                 </DialogDescription>
                             </DialogHeader>
                             <form
-                                onSubmit={handleAddOwner}
+                                onSubmit={handleAddUser}
                                 className="space-y-4"
                             >
                                 <div className="grid grid-cols-2 gap-4">
@@ -295,10 +372,10 @@ export default function OwnersPage() {
                                         </Label>
                                         <Input
                                             id="firstName"
-                                            value={newOwner.firstName}
+                                            value={newUser.firstName}
                                             onChange={(e) =>
-                                                setNewOwner({
-                                                    ...newOwner,
+                                                setNewUser({
+                                                    ...newUser,
                                                     firstName: e.target.value,
                                                 })
                                             }
@@ -311,10 +388,10 @@ export default function OwnersPage() {
                                         </Label>
                                         <Input
                                             id="lastName"
-                                            value={newOwner.lastName}
+                                            value={newUser.lastName}
                                             onChange={(e) =>
-                                                setNewOwner({
-                                                    ...newOwner,
+                                                setNewUser({
+                                                    ...newUser,
                                                     lastName: e.target.value,
                                                 })
                                             }
@@ -327,10 +404,10 @@ export default function OwnersPage() {
                                     <Input
                                         id="email"
                                         type="email"
-                                        value={newOwner.email}
+                                        value={newUser.email}
                                         onChange={(e) =>
-                                            setNewOwner({
-                                                ...newOwner,
+                                            setNewUser({
+                                                ...newUser,
                                                 email: e.target.value,
                                             })
                                         }
@@ -338,15 +415,39 @@ export default function OwnersPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
+                                    <Label htmlFor="type">User Type</Label>
+                                    <select
+                                        id="type"
+                                        aria-label="User Type"
+                                        value={newUser.type}
+                                        onChange={(e) =>
+                                            setNewUser({
+                                                ...newUser,
+                                                type: e.target.value as
+                                                    | "owner"
+                                                    | "employee"
+                                                    | "manager",
+                                            })
+                                        }
+                                        className="w-full p-2 border rounded-md"
+                                    >
+                                        <option value="owner">Owner</option>
+                                        <option value="employee">
+                                            Employee
+                                        </option>
+                                        <option value="manager">Manager</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
                                     <Label htmlFor="phone">
                                         Phone (Optional)
                                     </Label>
                                     <Input
                                         id="phone"
-                                        value={newOwner.phone}
+                                        value={newUser.phone}
                                         onChange={(e) =>
-                                            setNewOwner({
-                                                ...newOwner,
+                                            setNewUser({
+                                                ...newUser,
                                                 phone: e.target.value,
                                             })
                                         }
@@ -358,10 +459,10 @@ export default function OwnersPage() {
                                     </Label>
                                     <Input
                                         id="propertyUnit"
-                                        value={newOwner.propertyUnit}
+                                        value={newUser.propertyUnit}
                                         onChange={(e) =>
-                                            setNewOwner({
-                                                ...newOwner,
+                                            setNewUser({
+                                                ...newUser,
                                                 propertyUnit: e.target.value,
                                             })
                                         }
@@ -374,10 +475,10 @@ export default function OwnersPage() {
                                     <select
                                         id="paymentStatus"
                                         aria-label="Payment Status"
-                                        value={newOwner.paymentStatus}
+                                        value={newUser.paymentStatus}
                                         onChange={(e) =>
-                                            setNewOwner({
-                                                ...newOwner,
+                                            setNewUser({
+                                                ...newUser,
                                                 paymentStatus: e.target
                                                     .value as
                                                     | "paid"
@@ -400,16 +501,16 @@ export default function OwnersPage() {
                                         id="lastPaymentDate"
                                         type="date"
                                         value={
-                                            newOwner.lastPaymentDate
-                                                ? newOwner.lastPaymentDate
+                                            newUser.lastPaymentDate
+                                                ? newUser.lastPaymentDate
                                                       .toDate()
                                                       .toISOString()
                                                       .split("T")[0]
                                                 : ""
                                         }
                                         onChange={(e) =>
-                                            setNewOwner({
-                                                ...newOwner,
+                                            setNewUser({
+                                                ...newUser,
                                                 lastPaymentDate: e.target.value
                                                     ? Timestamp.fromDate(
                                                           new Date(
@@ -444,7 +545,7 @@ export default function OwnersPage() {
                                     >
                                         Cancel
                                     </Button>
-                                    <Button type="submit">Add Owner</Button>
+                                    <Button type="submit">Add User</Button>
                                 </div>
                             </form>
                         </DialogContent>
@@ -463,7 +564,7 @@ export default function OwnersPage() {
                                 </DialogDescription>
                             </DialogHeader>
                             <form
-                                onSubmit={handleUpdateOwner}
+                                onSubmit={handleUpdateUser}
                                 className="space-y-4"
                             >
                                 <div className="grid grid-cols-2 gap-4">
@@ -473,11 +574,9 @@ export default function OwnersPage() {
                                         </Label>
                                         <Input
                                             id="editFirstName"
-                                            value={
-                                                editingOwner?.firstName || ""
-                                            }
+                                            value={editingUser?.firstName || ""}
                                             onChange={(e) =>
-                                                setEditingOwner((prev) =>
+                                                setEditingUser((prev) =>
                                                     prev
                                                         ? {
                                                               ...prev,
@@ -497,9 +596,9 @@ export default function OwnersPage() {
                                         </Label>
                                         <Input
                                             id="editLastName"
-                                            value={editingOwner?.lastName || ""}
+                                            value={editingUser?.lastName || ""}
                                             onChange={(e) =>
-                                                setEditingOwner((prev) =>
+                                                setEditingUser((prev) =>
                                                     prev
                                                         ? {
                                                               ...prev,
@@ -519,9 +618,9 @@ export default function OwnersPage() {
                                     <Input
                                         id="editEmail"
                                         type="email"
-                                        value={editingOwner?.email || ""}
+                                        value={editingUser?.email || ""}
                                         onChange={(e) =>
-                                            setEditingOwner((prev) =>
+                                            setEditingUser((prev) =>
                                                 prev
                                                     ? {
                                                           ...prev,
@@ -537,9 +636,9 @@ export default function OwnersPage() {
                                     <Label htmlFor="editPhone">Phone</Label>
                                     <Input
                                         id="editPhone"
-                                        value={editingOwner?.phone || ""}
+                                        value={editingUser?.phone || ""}
                                         onChange={(e) =>
-                                            setEditingOwner((prev) =>
+                                            setEditingUser((prev) =>
                                                 prev
                                                     ? {
                                                           ...prev,
@@ -556,9 +655,9 @@ export default function OwnersPage() {
                                     </Label>
                                     <Input
                                         id="editPropertyUnit"
-                                        value={editingOwner?.propertyUnit || ""}
+                                        value={editingUser?.propertyUnit || ""}
                                         onChange={(e) =>
-                                            setEditingOwner((prev) =>
+                                            setEditingUser((prev) =>
                                                 prev
                                                     ? {
                                                           ...prev,
@@ -578,11 +677,11 @@ export default function OwnersPage() {
                                         id="editPaymentStatus"
                                         aria-label="Payment Status"
                                         value={
-                                            editingOwner?.paymentStatus ||
+                                            editingUser?.paymentStatus ||
                                             "pending"
                                         }
                                         onChange={(e) =>
-                                            setEditingOwner((prev) =>
+                                            setEditingUser((prev) =>
                                                 prev
                                                     ? {
                                                           ...prev,
@@ -610,15 +709,15 @@ export default function OwnersPage() {
                                         id="editLastPaymentDate"
                                         type="date"
                                         value={
-                                            editingOwner?.lastPaymentDate
-                                                ? editingOwner.lastPaymentDate
+                                            editingUser?.lastPaymentDate
+                                                ? editingUser.lastPaymentDate
                                                       .toDate()
                                                       .toISOString()
                                                       .split("T")[0]
                                                 : ""
                                         }
                                         onChange={(e) =>
-                                            setEditingOwner((prev) =>
+                                            setEditingUser((prev) =>
                                                 prev
                                                     ? {
                                                           ...prev,
@@ -641,11 +740,9 @@ export default function OwnersPage() {
                                         title="Active"
                                         type="checkbox"
                                         id="editIsActive"
-                                        checked={
-                                            editingOwner?.isActive || false
-                                        }
+                                        checked={editingUser?.isActive || false}
                                         onChange={(e) =>
-                                            setEditingOwner((prev) =>
+                                            setEditingUser((prev) =>
                                                 prev
                                                     ? {
                                                           ...prev,
@@ -682,39 +779,37 @@ export default function OwnersPage() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Total Owners
+                            Total Users
+                        </CardTitle>
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{users.length}</div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            Active Users
                         </CardTitle>
                         <Users className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {owners.length}
+                            {users.filter((user) => user.isActive).length}
                         </div>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Active Owners
+                            Inactive Users
                         </CardTitle>
                         <Users className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {owners.filter((owner) => owner.isActive).length}
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Inactive Owners
-                        </CardTitle>
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {owners.filter((owner) => !owner.isActive).length}
+                            {users.filter((user) => !user.isActive).length}
                         </div>
                     </CardContent>
                 </Card>
@@ -761,18 +856,19 @@ export default function OwnersPage() {
             {/* Owners Table */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Property Owners</CardTitle>
+                    <CardTitle>Property Users</CardTitle>
                     <CardDescription>
-                        {filteredOwners.length} of {owners.length} owners
+                        {filteredUsers.length} of {users.length} users
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {filteredOwners.length > 0 ? (
+                    {filteredUsers.length > 0 ? (
                         <Table>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Name</TableHead>
                                     <TableHead>Email</TableHead>
+                                    <TableHead>Type</TableHead>
                                     <TableHead>Phone</TableHead>
                                     <TableHead>Property Unit</TableHead>
                                     <TableHead>Status</TableHead>
@@ -781,27 +877,35 @@ export default function OwnersPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredOwners.map((owner) => (
-                                    <TableRow key={owner.id}>
+                                {filteredUsers.map((user) => (
+                                    <TableRow key={user.id}>
                                         <TableCell className="font-medium">
-                                            {owner.firstName} {owner.lastName}
+                                            {user.firstName} {user.lastName}
                                         </TableCell>
-                                        <TableCell>{owner.email}</TableCell>
+                                        <TableCell>{user.email}</TableCell>
                                         <TableCell>
-                                            {owner.phone || "N/A"}
+                                            <Badge
+                                                variant="outline"
+                                                className="capitalize"
+                                            >
+                                                {user.type}
+                                            </Badge>
                                         </TableCell>
                                         <TableCell>
-                                            {owner.propertyUnit || "N/A"}
+                                            {user.phone || "N/A"}
+                                        </TableCell>
+                                        <TableCell>
+                                            {user.propertyUnit || "N/A"}
                                         </TableCell>
                                         <TableCell>
                                             <Badge
                                                 variant={
-                                                    owner.isActive
+                                                    user.isActive
                                                         ? "default"
                                                         : "secondary"
                                                 }
                                             >
-                                                {owner.isActive
+                                                {user.isActive
                                                     ? "Active"
                                                     : "Inactive"}
                                             </Badge>
@@ -809,21 +913,21 @@ export default function OwnersPage() {
                                         <TableCell>
                                             <Badge
                                                 variant={
-                                                    owner.paymentStatus ===
+                                                    user.paymentStatus ===
                                                     "paid"
                                                         ? "default"
-                                                        : owner.paymentStatus ===
+                                                        : user.paymentStatus ===
                                                           "pending"
                                                         ? "secondary"
                                                         : "destructive"
                                                 }
                                             >
-                                                {owner.paymentStatus ||
+                                                {user.paymentStatus ||
                                                     "Pending"}
                                             </Badge>
-                                            {owner.lastPaymentDate && (
+                                            {user.lastPaymentDate && (
                                                 <p className="text-xs text-muted-foreground mt-1">
-                                                    {owner.lastPaymentDate
+                                                    {user.lastPaymentDate
                                                         .toDate()
                                                         .toLocaleDateString()}
                                                 </p>
@@ -835,7 +939,7 @@ export default function OwnersPage() {
                                                     variant="outline"
                                                     size="sm"
                                                     onClick={() =>
-                                                        openEditDialog(owner)
+                                                        openEditDialog(user)
                                                     }
                                                 >
                                                     <Edit className="h-4 w-4" />
@@ -856,19 +960,19 @@ export default function OwnersPage() {
                         <div className="text-center py-8">
                             <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                             <h3 className="text-lg font-medium mb-2">
-                                No owners found
+                                No users found
                             </h3>
                             <p className="text-muted-foreground mb-4">
                                 {searchTerm
                                     ? "Try adjusting your search"
-                                    : "Get started by adding your first property owner"}
+                                    : "Get started by adding your first property user"}
                             </p>
                             {!searchTerm && (
                                 <Button
                                     onClick={() => setIsAddDialogOpen(true)}
                                 >
                                     <Plus className="h-4 w-4 mr-2" />
-                                    Add First Owner
+                                    Add First User
                                 </Button>
                             )}
                         </div>

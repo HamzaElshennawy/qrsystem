@@ -1,0 +1,248 @@
+[debug] [2025-09-20T13:49:05.472Z] ----------------------------------------------------------------------
+[debug] [2025-09-20T13:49:05.476Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\elshe\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only firestore:rules
+[debug] [2025-09-20T13:49:05.476Z] CLI Version:   14.16.0
+[debug] [2025-09-20T13:49:05.476Z] Platform:      win32
+[debug] [2025-09-20T13:49:05.476Z] Node Version:  v23.8.0
+[debug] [2025-09-20T13:49:05.477Z] Time:          Sat Sep 20 2025 16:49:05 GMT+0300 (Eastern European Summer Time)
+[debug] [2025-09-20T13:49:05.477Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-09-20T13:49:05.480Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2025-09-20T13:49:05.749Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-20T13:49:05.750Z] > authorizing via signed-in user (elshennawyhamza@gmail.com)
+[debug] [2025-09-20T13:49:05.750Z] [iam] checking project qr-compounds for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2025-09-20T13:49:05.751Z] Checked if tokens are valid: false, expires at: 1758055797819
+[debug] [2025-09-20T13:49:05.751Z] Checked if tokens are valid: false, expires at: 1758055797819
+[debug] [2025-09-20T13:49:05.752Z] > refreshing access token with scopes: []
+[debug] [2025-09-20T13:49:05.753Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-09-20T13:49:05.754Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-20T13:49:06.187Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-09-20T13:49:06.188Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-09-20T13:49:06.216Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions [none]
+[debug] [2025-09-20T13:49:06.216Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions x-goog-quota-user=projects/qr-compounds
+[debug] [2025-09-20T13:49:06.216Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2025-09-20T13:49:06.279Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-09-20T13:49:06.279Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2025-09-20T13:49:07.312Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions 200
+[debug] [2025-09-20T13:49:07.312Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[info] 
+[info] === Deploying to 'qr-compounds'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2025-09-20T13:49:07.319Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:49:07.319Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:49:07.319Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test [none]
+[debug] [2025-09-20T13:49:07.319Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test [omitted]
+[debug] [2025-09-20T13:49:08.361Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test 200
+[debug] [2025-09-20T13:49:08.362Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test {}
+[info] +  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2025-09-20T13:49:08.364Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:49:08.364Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:49:08.364Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/qr-compounds/databases/(default) [none]
+[debug] [2025-09-20T13:49:09.043Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/qr-compounds/databases/(default) 200
+[debug] [2025-09-20T13:49:09.043Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/qr-compounds/databases/(default) {"name":"projects/qr-compounds/databases/(default)","uid":"6b01c166-9c3c-4dc6-ad5b-f5003d3657b3","createTime":"2025-09-14T15:43:51.807238Z","updateTime":"2025-09-14T15:43:51.807238Z","locationId":"eur3","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2025-09-20T12:49:08.531651Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"e","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"etag":"IL/v2829548DMKHX9J/M2I8D"}
+[debug] [2025-09-20T13:49:09.044Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:49:09.044Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:49:09.044Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases pageSize=10&pageToken=
+[debug] [2025-09-20T13:49:09.973Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases 200
+[debug] [2025-09-20T13:49:09.973Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases {"releases":[{"name":"projects/qr-compounds/releases/cloud.firestore","rulesetName":"projects/qr-compounds/rulesets/34cd5983-74f3-4659-8ff7-6d72accf2e4b","createTime":"2025-09-14T15:43:55.857257Z","updateTime":"2025-09-14T16:24:59.347210Z"}]}
+[debug] [2025-09-20T13:49:09.974Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:49:09.974Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:49:09.974Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets/34cd5983-74f3-4659-8ff7-6d72accf2e4b [none]
+[debug] [2025-09-20T13:49:10.787Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets/34cd5983-74f3-4659-8ff7-6d72accf2e4b 200
+[debug] [2025-09-20T13:49:10.787Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets/34cd5983-74f3-4659-8ff7-6d72accf2e4b [omitted]
+[info] i  firestore: uploading rules firestore.rules... 
+[debug] [2025-09-20T13:49:10.789Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:49:10.789Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:49:10.789Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets [none]
+[debug] [2025-09-20T13:49:10.789Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets [omitted]
+[debug] [2025-09-20T13:49:11.709Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets 200
+[debug] [2025-09-20T13:49:11.709Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets {"name":"projects/qr-compounds/rulesets/d65b6072-bed3-4dc6-a662-31e13de9fac4","source":{"files":[{"content":"rules_version = '2';\r\nservice cloud.firestore {\r\n  match /databases/{database}/documents {\r\n    // Helper function to check if user is authenticated\r\n    function isAuthenticated() {\r\n      return request.auth != null;\r\n    }\r\n\r\n    // Helper function to check if user owns the document\r\n    function isOwner(userId) {\r\n      return isAuthenticated() && request.auth.uid == userId;\r\n    }\r\n\r\n    // Helper function to check if user owns the compound\r\n    function ownsCompound(compoundId) {\r\n      return isAuthenticated() &&\r\n             exists(/databases/$(database)/documents/compounds/$(compoundId)) &&\r\n             get(/databases/$(database)/documents/compounds/$(compoundId)).data.adminId == request.auth.uid;\r\n    }\r\n\r\n    // Compounds collection\r\n    match /compounds/{compoundId} {\r\n      // Allow read/write for compound owner\r\n      allow read, write: if ownsCompound(compoundId);\r\n\r\n      // Allow read for users in the compound\r\n      allow read: if isAuthenticated() &&\r\n                  exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&\r\n                  get(/databases/$(database)/documents/users/$(request.auth.uid)).data.compoundId == compoundId;\r\n    }\r\n\r\n    // Users collection (formerly owners)\r\n    match /users/{userId} {\r\n      // Allow read/write for compound owner\r\n      allow read, write: if ownsCompound(resource.data.compoundId);\r\n\r\n      // Allow read for the user themselves\r\n      allow read: if isOwner(userId);\r\n\r\n      // Allow create for authenticated users (for registration)\r\n      allow create: if isAuthenticated();\r\n    }\r\n\r\n    // QR Codes collection\r\n    match /qrcodes/{qrId} {\r\n      // Allow read/write for compound owner\r\n      allow read, write: if ownsCompound(resource.data.compoundId);\r\n\r\n      // Allow read for users in the compound\r\n      allow read: if isAuthenticated() &&\r\n                  exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&\r\n                  get(/databases/$(database)/documents/users/$(request.auth.uid)).data.compoundId == resource.data.compoundId;\r\n    }\r\n\r\n    // Entry Points collection\r\n    match /entryPoints/{entryId} {\r\n      // Allow read/write for compound owner\r\n      allow read, write: if ownsCompound(resource.data.compoundId);\r\n\r\n      // Allow read for users in the compound\r\n      allow read: if isAuthenticated() &&\r\n                  exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&\r\n                  get(/databases/$(database)/documents/users/$(request.auth.uid)).data.compoundId == resource.data.compoundId;\r\n    }\r\n\r\n    // Legacy owners collection (for backward compatibility)\r\n    match /owners/{ownerId} {\r\n      // Allow read/write for compound owner\r\n      allow read, write: if ownsCompound(resource.data.compoundId);\r\n\r\n      // Allow read for the owner themselves\r\n      allow read: if isOwner(ownerId);\r\n\r\n      // Allow create for authenticated users\r\n      allow create: if isAuthenticated();\r\n    }\r\n  }\r\n}","name":"firestore.rules"}]},"createTime":"2025-09-20T13:49:11.260943Z","metadata":{"services":["cloud.firestore"]}}
+[debug] [2025-09-20T13:49:11.709Z] [rules] created ruleset projects/qr-compounds/rulesets/d65b6072-bed3-4dc6-a662-31e13de9fac4
+[debug] [2025-09-20T13:49:11.710Z] [rules] releasing cloud.firestore/(default) with ruleset projects/qr-compounds/rulesets/d65b6072-bed3-4dc6-a662-31e13de9fac4
+[debug] [2025-09-20T13:49:11.710Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:49:11.711Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:49:11.711Z] >>> [apiv2][query] PATCH https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases/cloud.firestore/(default) [none]
+[debug] [2025-09-20T13:49:11.711Z] >>> [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases/cloud.firestore/(default) {"release":{"name":"projects/qr-compounds/releases/cloud.firestore/(default)","rulesetName":"projects/qr-compounds/rulesets/d65b6072-bed3-4dc6-a662-31e13de9fac4"}}
+[debug] [2025-09-20T13:49:12.631Z] <<< [apiv2][status] PATCH https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases/cloud.firestore/(default) 200
+[debug] [2025-09-20T13:51:15.741Z] ----------------------------------------------------------------------
+[debug] [2025-09-20T13:51:15.746Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\elshe\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only firestore:rules
+[debug] [2025-09-20T13:51:15.746Z] CLI Version:   14.16.0
+[debug] [2025-09-20T13:51:15.747Z] Platform:      win32
+[debug] [2025-09-20T13:51:15.747Z] Node Version:  v23.8.0
+[debug] [2025-09-20T13:51:15.747Z] Time:          Sat Sep 20 2025 16:51:15 GMT+0300 (Eastern European Summer Time)
+[debug] [2025-09-20T13:51:15.747Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-09-20T13:51:16.001Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-20T13:51:16.002Z] > authorizing via signed-in user (elshennawyhamza@gmail.com)
+[debug] [2025-09-20T13:51:16.002Z] [iam] checking project qr-compounds for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2025-09-20T13:51:16.004Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:51:16.004Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:51:16.006Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions [none]
+[debug] [2025-09-20T13:51:16.006Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions x-goog-quota-user=projects/qr-compounds
+[debug] [2025-09-20T13:51:16.006Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2025-09-20T13:51:17.472Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions 200
+[debug] [2025-09-20T13:51:17.473Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[info] 
+[info] === Deploying to 'qr-compounds'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2025-09-20T13:51:17.479Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:51:17.480Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:51:17.480Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test [none]
+[debug] [2025-09-20T13:51:17.480Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test [omitted]
+[debug] [2025-09-20T13:51:18.593Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test 200
+[debug] [2025-09-20T13:51:18.593Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test {}
+[info] +  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2025-09-20T13:51:18.596Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:51:18.596Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:51:18.596Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/qr-compounds/databases/(default) [none]
+[debug] [2025-09-20T13:51:19.601Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/qr-compounds/databases/(default) 200
+[debug] [2025-09-20T13:51:19.601Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/qr-compounds/databases/(default) {"name":"projects/qr-compounds/databases/(default)","uid":"6b01c166-9c3c-4dc6-ad5b-f5003d3657b3","createTime":"2025-09-14T15:43:51.807238Z","updateTime":"2025-09-14T15:43:51.807238Z","locationId":"eur3","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2025-09-20T12:51:19.013409Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"e","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"etag":"IJns94u+548DMKHX9J/M2I8D"}
+[debug] [2025-09-20T13:51:19.603Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:51:19.603Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:51:19.603Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases pageSize=10&pageToken=
+[debug] [2025-09-20T13:51:20.560Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases 200
+[debug] [2025-09-20T13:51:20.561Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases {"releases":[{"name":"projects/qr-compounds/releases/cloud.firestore","rulesetName":"projects/qr-compounds/rulesets/d65b6072-bed3-4dc6-a662-31e13de9fac4","createTime":"2025-09-14T15:43:55.857257Z","updateTime":"2025-09-20T13:49:12.188225Z"}]}
+[debug] [2025-09-20T13:51:20.561Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:51:20.561Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:51:20.562Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets/d65b6072-bed3-4dc6-a662-31e13de9fac4 [none]
+[debug] [2025-09-20T13:51:21.350Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets/d65b6072-bed3-4dc6-a662-31e13de9fac4 200
+[debug] [2025-09-20T13:51:21.351Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets/d65b6072-bed3-4dc6-a662-31e13de9fac4 [omitted]
+[info] i  firestore: uploading rules firestore.rules... 
+[debug] [2025-09-20T13:51:21.352Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:51:21.352Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:51:21.352Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets [none]
+[debug] [2025-09-20T13:51:21.352Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets [omitted]
+[debug] [2025-09-20T13:51:22.484Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets 200
+[debug] [2025-09-20T13:51:22.484Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets {"name":"projects/qr-compounds/rulesets/bae37356-5131-460a-9dfd-75b244e7579d","source":{"files":[{"content":"rules_version = '2';\r\nservice cloud.firestore {\r\n  match /databases/{database}/documents {\r\n    // Helper function to check if user is authenticated\r\n    function isAuthenticated() {\r\n      return request.auth != null;\r\n    }\r\n\r\n    // Helper function to check if user owns the document\r\n    function isOwner(userId) {\r\n      return isAuthenticated() && request.auth.uid == userId;\r\n    }\r\n\r\n    // Helper function to check if user owns the compound\r\n    function ownsCompound(compoundId) {\r\n      return isAuthenticated() &&\r\n             exists(/databases/$(database)/documents/compounds/$(compoundId)) &&\r\n             get(/databases/$(database)/documents/compounds/$(compoundId)).data.adminId == request.auth.uid;\r\n    }\r\n\r\n    // Compounds collection\r\n    match /compounds/{compoundId} {\r\n      // Allow create for authenticated users (they become the owner)\r\n      allow create: if isAuthenticated();\r\n\r\n      // Allow read/write for compound owner\r\n      allow read, update, delete: if ownsCompound(compoundId);\r\n\r\n      // Allow read for users in the compound\r\n      allow read: if isAuthenticated() &&\r\n                  exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&\r\n                  get(/databases/$(database)/documents/users/$(request.auth.uid)).data.compoundId == compoundId;\r\n    }\r\n\r\n    // Users collection (formerly owners)\r\n    match /users/{userId} {\r\n      // Allow read/write for compound owner\r\n      allow read, write: if ownsCompound(resource.data.compoundId);\r\n\r\n      // Allow read for the user themselves\r\n      allow read: if isOwner(userId);\r\n\r\n      // Allow create for authenticated users (for registration)\r\n      allow create: if isAuthenticated();\r\n    }\r\n\r\n    // QR Codes collection\r\n    match /qrcodes/{qrId} {\r\n      // Allow read/write for compound owner\r\n      allow read, write: if ownsCompound(resource.data.compoundId);\r\n\r\n      // Allow read for users in the compound\r\n      allow read: if isAuthenticated() &&\r\n                  exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&\r\n                  get(/databases/$(database)/documents/users/$(request.auth.uid)).data.compoundId == resource.data.compoundId;\r\n    }\r\n\r\n    // Entry Points collection\r\n    match /entryPoints/{entryId} {\r\n      // Allow read/write for compound owner\r\n      allow read, write: if ownsCompound(resource.data.compoundId);\r\n\r\n      // Allow read for users in the compound\r\n      allow read: if isAuthenticated() &&\r\n                  exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&\r\n                  get(/databases/$(database)/documents/users/$(request.auth.uid)).data.compoundId == resource.data.compoundId;\r\n    }\r\n\r\n    // Legacy owners collection (for backward compatibility)\r\n    match /owners/{ownerId} {\r\n      // Allow read/write for compound owner\r\n      allow read, write: if ownsCompound(resource.data.compoundId);\r\n\r\n      // Allow read for the owner themselves\r\n      allow read: if isOwner(ownerId);\r\n\r\n      // Allow create for authenticated users\r\n      allow create: if isAuthenticated();\r\n    }\r\n  }\r\n}","name":"firestore.rules"}]},"createTime":"2025-09-20T13:51:21.798607Z","metadata":{"services":["cloud.firestore"]}}
+[debug] [2025-09-20T13:51:22.485Z] [rules] created ruleset projects/qr-compounds/rulesets/bae37356-5131-460a-9dfd-75b244e7579d
+[debug] [2025-09-20T13:51:22.485Z] [rules] releasing cloud.firestore/(default) with ruleset projects/qr-compounds/rulesets/bae37356-5131-460a-9dfd-75b244e7579d
+[debug] [2025-09-20T13:51:22.486Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:51:22.486Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:51:22.486Z] >>> [apiv2][query] PATCH https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases/cloud.firestore/(default) [none]
+[debug] [2025-09-20T13:51:22.486Z] >>> [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases/cloud.firestore/(default) {"release":{"name":"projects/qr-compounds/releases/cloud.firestore/(default)","rulesetName":"projects/qr-compounds/rulesets/bae37356-5131-460a-9dfd-75b244e7579d"}}
+[debug] [2025-09-20T13:51:23.502Z] <<< [apiv2][status] PATCH https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases/cloud.firestore/(default) 200
+[debug] [2025-09-20T13:54:24.054Z] ----------------------------------------------------------------------
+[debug] [2025-09-20T13:54:24.057Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\elshe\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only firestore:rules
+[debug] [2025-09-20T13:54:24.058Z] CLI Version:   14.16.0
+[debug] [2025-09-20T13:54:24.058Z] Platform:      win32
+[debug] [2025-09-20T13:54:24.059Z] Node Version:  v23.8.0
+[debug] [2025-09-20T13:54:24.059Z] Time:          Sat Sep 20 2025 16:54:24 GMT+0300 (Eastern European Summer Time)
+[debug] [2025-09-20T13:54:24.059Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-09-20T13:54:24.281Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-20T13:54:24.282Z] > authorizing via signed-in user (elshennawyhamza@gmail.com)
+[debug] [2025-09-20T13:54:24.282Z] [iam] checking project qr-compounds for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2025-09-20T13:54:24.284Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:54:24.284Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:54:24.285Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions [none]
+[debug] [2025-09-20T13:54:24.285Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions x-goog-quota-user=projects/qr-compounds
+[debug] [2025-09-20T13:54:24.286Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2025-09-20T13:54:25.789Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions 200
+[debug] [2025-09-20T13:54:25.790Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[info] 
+[info] === Deploying to 'qr-compounds'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2025-09-20T13:54:25.796Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:54:25.796Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:54:25.796Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test [none]
+[debug] [2025-09-20T13:54:25.796Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test [omitted]
+[debug] [2025-09-20T13:54:27.004Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test 200
+[debug] [2025-09-20T13:54:27.005Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test {}
+[info] +  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2025-09-20T13:54:27.007Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:54:27.007Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:54:27.007Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/qr-compounds/databases/(default) [none]
+[debug] [2025-09-20T13:54:27.830Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/qr-compounds/databases/(default) 200
+[debug] [2025-09-20T13:54:27.830Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/qr-compounds/databases/(default) {"name":"projects/qr-compounds/databases/(default)","uid":"6b01c166-9c3c-4dc6-ad5b-f5003d3657b3","createTime":"2025-09-14T15:43:51.807238Z","updateTime":"2025-09-14T15:43:51.807238Z","locationId":"eur3","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2025-09-20T12:54:27.183601Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"e","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"etag":"IPHo1OW+548DMKHX9J/M2I8D"}
+[debug] [2025-09-20T13:54:27.832Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:54:27.832Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:54:27.832Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases pageSize=10&pageToken=
+[debug] [2025-09-20T13:54:28.642Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases 200
+[debug] [2025-09-20T13:54:28.643Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases {"releases":[{"name":"projects/qr-compounds/releases/cloud.firestore","rulesetName":"projects/qr-compounds/rulesets/bae37356-5131-460a-9dfd-75b244e7579d","createTime":"2025-09-14T15:43:55.857257Z","updateTime":"2025-09-20T13:51:22.966163Z"}]}
+[debug] [2025-09-20T13:54:28.643Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:54:28.643Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:54:28.643Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets/bae37356-5131-460a-9dfd-75b244e7579d [none]
+[debug] [2025-09-20T13:54:29.565Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets/bae37356-5131-460a-9dfd-75b244e7579d 200
+[debug] [2025-09-20T13:54:29.566Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets/bae37356-5131-460a-9dfd-75b244e7579d [omitted]
+[info] i  firestore: uploading rules firestore.rules... 
+[debug] [2025-09-20T13:54:29.568Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:54:29.568Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:54:29.568Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets [none]
+[debug] [2025-09-20T13:54:29.568Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets [omitted]
+[debug] [2025-09-20T13:54:30.517Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets 200
+[debug] [2025-09-20T13:54:30.518Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets {"name":"projects/qr-compounds/rulesets/693f80c4-ea9d-4bf4-b819-9e2920b4f15c","source":{"files":[{"content":"rules_version = '2';\r\nservice cloud.firestore {\r\n  match /databases/{database}/documents {\r\n    // Helper function to check if user is authenticated\r\n    function isAuthenticated() {\r\n      return request.auth != null;\r\n    }\r\n\r\n    // Helper function to check if user owns the document\r\n    function isOwner(userId) {\r\n      return isAuthenticated() && request.auth.uid == userId;\r\n    }\r\n\r\n    // Helper function to check if user owns the compound\r\n    function ownsCompound(compoundId) {\r\n      return isAuthenticated() &&\r\n             exists(/databases/$(database)/documents/compounds/$(compoundId)) &&\r\n             get(/databases/$(database)/documents/compounds/$(compoundId)).data.adminId == request.auth.uid;\r\n    }\r\n\r\n    // Compounds collection\r\n    match /compounds/{compoundId} {\r\n      // Allow create for authenticated users (they become the owner)\r\n      allow create: if isAuthenticated();\r\n\r\n      // Allow read/write for compound owner\r\n      allow read, update, delete: if ownsCompound(compoundId);\r\n\r\n      // Allow read for users in the compound\r\n      allow read: if isAuthenticated() &&\r\n                  exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&\r\n                  get(/databases/$(database)/documents/users/$(request.auth.uid)).data.compoundId == compoundId;\r\n    }\r\n\r\n    // Users collection (formerly owners)\r\n    match /users/{userId} {\r\n      // Allow compound owner full access to users in their compound\r\n      allow read, write: if isAuthenticated() &&\r\n                          exists(/databases/$(database)/documents/compounds/$(resource.data.compoundId)) &&\r\n                          get(/databases/$(database)/documents/compounds/$(resource.data.compoundId)).data.adminId == request.auth.uid;\r\n\r\n      // Allow read for the user themselves\r\n      allow read: if isOwner(userId);\r\n\r\n      // Allow create for authenticated users (for registration/bulk import)\r\n      allow create: if isAuthenticated();\r\n    }\r\n\r\n    // QR Codes collection\r\n    match /qrcodes/{qrId} {\r\n      // Allow read/write for compound owner\r\n      allow read, write: if ownsCompound(resource.data.compoundId);\r\n\r\n      // Allow read for users in the compound\r\n      allow read: if isAuthenticated() &&\r\n                  exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&\r\n                  get(/databases/$(database)/documents/users/$(request.auth.uid)).data.compoundId == resource.data.compoundId;\r\n    }\r\n\r\n    // Entry Points collection\r\n    match /entryPoints/{entryId} {\r\n      // Allow read/write for compound owner\r\n      allow read, write: if ownsCompound(resource.data.compoundId);\r\n\r\n      // Allow read for users in the compound\r\n      allow read: if isAuthenticated() &&\r\n                  exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&\r\n                  get(/databases/$(database)/documents/users/$(request.auth.uid)).data.compoundId == resource.data.compoundId;\r\n    }\r\n\r\n    // Legacy owners collection (for backward compatibility)\r\n    match /owners/{ownerId} {\r\n      // Allow read/write for compound owner\r\n      allow read, write: if ownsCompound(resource.data.compoundId);\r\n\r\n      // Allow read for the owner themselves\r\n      allow read: if isOwner(ownerId);\r\n\r\n      // Allow create for authenticated users\r\n      allow create: if isAuthenticated();\r\n    }\r\n  }\r\n}","name":"firestore.rules"}]},"createTime":"2025-09-20T13:54:30.078575Z","metadata":{"services":["cloud.firestore"]}}
+[debug] [2025-09-20T13:54:30.518Z] [rules] created ruleset projects/qr-compounds/rulesets/693f80c4-ea9d-4bf4-b819-9e2920b4f15c
+[debug] [2025-09-20T13:54:30.519Z] [rules] releasing cloud.firestore/(default) with ruleset projects/qr-compounds/rulesets/693f80c4-ea9d-4bf4-b819-9e2920b4f15c
+[debug] [2025-09-20T13:54:30.519Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:54:30.519Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:54:30.520Z] >>> [apiv2][query] PATCH https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases/cloud.firestore/(default) [none]
+[debug] [2025-09-20T13:54:30.520Z] >>> [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases/cloud.firestore/(default) {"release":{"name":"projects/qr-compounds/releases/cloud.firestore/(default)","rulesetName":"projects/qr-compounds/rulesets/693f80c4-ea9d-4bf4-b819-9e2920b4f15c"}}
+[debug] [2025-09-20T13:54:31.608Z] <<< [apiv2][status] PATCH https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases/cloud.firestore/(default) 200
+[debug] [2025-09-20T13:56:21.287Z] ----------------------------------------------------------------------
+[debug] [2025-09-20T13:56:21.290Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\elshe\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only firestore:rules
+[debug] [2025-09-20T13:56:21.291Z] CLI Version:   14.16.0
+[debug] [2025-09-20T13:56:21.291Z] Platform:      win32
+[debug] [2025-09-20T13:56:21.291Z] Node Version:  v23.8.0
+[debug] [2025-09-20T13:56:21.291Z] Time:          Sat Sep 20 2025 16:56:21 GMT+0300 (Eastern European Summer Time)
+[debug] [2025-09-20T13:56:21.292Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-09-20T13:56:21.513Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-20T13:56:21.515Z] > authorizing via signed-in user (elshennawyhamza@gmail.com)
+[debug] [2025-09-20T13:56:21.515Z] [iam] checking project qr-compounds for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2025-09-20T13:56:21.516Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:56:21.517Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:56:21.518Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions [none]
+[debug] [2025-09-20T13:56:21.518Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions x-goog-quota-user=projects/qr-compounds
+[debug] [2025-09-20T13:56:21.518Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2025-09-20T13:56:22.717Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions 200
+[debug] [2025-09-20T13:56:22.717Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/qr-compounds:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[info] 
+[info] === Deploying to 'qr-compounds'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2025-09-20T13:56:22.721Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:56:22.721Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:56:22.721Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test [none]
+[debug] [2025-09-20T13:56:22.722Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test [omitted]
+[debug] [2025-09-20T13:56:24.082Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test 200
+[debug] [2025-09-20T13:56:24.082Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds:test {}
+[info] +  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2025-09-20T13:56:24.084Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:56:24.085Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:56:24.085Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/qr-compounds/databases/(default) [none]
+[debug] [2025-09-20T13:56:24.663Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/qr-compounds/databases/(default) 200
+[debug] [2025-09-20T13:56:24.664Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/qr-compounds/databases/(default) {"name":"projects/qr-compounds/databases/(default)","uid":"6b01c166-9c3c-4dc6-ad5b-f5003d3657b3","createTime":"2025-09-14T15:43:51.807238Z","updateTime":"2025-09-14T15:43:51.807238Z","locationId":"eur3","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2025-09-20T12:56:24.261384Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"e","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"etag":"IKPZvp2/548DMKHX9J/M2I8D"}
+[debug] [2025-09-20T13:56:24.666Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:56:24.666Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:56:24.666Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases pageSize=10&pageToken=
+[debug] [2025-09-20T13:56:25.372Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases 200
+[debug] [2025-09-20T13:56:25.372Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases {"releases":[{"name":"projects/qr-compounds/releases/cloud.firestore","rulesetName":"projects/qr-compounds/rulesets/693f80c4-ea9d-4bf4-b819-9e2920b4f15c","createTime":"2025-09-14T15:43:55.857257Z","updateTime":"2025-09-20T13:54:30.979748Z"}]}
+[debug] [2025-09-20T13:56:25.372Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:56:25.373Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:56:25.373Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets/693f80c4-ea9d-4bf4-b819-9e2920b4f15c [none]
+[debug] [2025-09-20T13:56:25.707Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets/693f80c4-ea9d-4bf4-b819-9e2920b4f15c 200
+[debug] [2025-09-20T13:56:25.707Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets/693f80c4-ea9d-4bf4-b819-9e2920b4f15c [omitted]
+[info] i  firestore: uploading rules firestore.rules... 
+[debug] [2025-09-20T13:56:25.708Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:56:25.708Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:56:25.708Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets [none]
+[debug] [2025-09-20T13:56:25.708Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets [omitted]
+[debug] [2025-09-20T13:56:26.192Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets 200
+[debug] [2025-09-20T13:56:26.192Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/qr-compounds/rulesets {"name":"projects/qr-compounds/rulesets/b29c373d-f57d-4de0-95d2-98139a7e4b5c","source":{"files":[{"content":"rules_version = '2';\r\nservice cloud.firestore {\r\n  match /databases/{database}/documents {\r\n    // Allow all authenticated users full access for debugging\r\n    // TODO: Replace with proper security rules after debugging\r\n    match /{document=**} {\r\n      allow read, write: if request.auth != null;\r\n    }\r\n  }\r\n}","name":"firestore.rules"}]},"createTime":"2025-09-20T13:56:25.673359Z","metadata":{"services":["cloud.firestore"]}}
+[debug] [2025-09-20T13:56:26.193Z] [rules] created ruleset projects/qr-compounds/rulesets/b29c373d-f57d-4de0-95d2-98139a7e4b5c
+[debug] [2025-09-20T13:56:26.193Z] [rules] releasing cloud.firestore/(default) with ruleset projects/qr-compounds/rulesets/b29c373d-f57d-4de0-95d2-98139a7e4b5c
+[debug] [2025-09-20T13:56:26.194Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:56:26.194Z] Checked if tokens are valid: true, expires at: 1758379745188
+[debug] [2025-09-20T13:56:26.194Z] >>> [apiv2][query] PATCH https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases/cloud.firestore/(default) [none]
+[debug] [2025-09-20T13:56:26.194Z] >>> [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases/cloud.firestore/(default) {"release":{"name":"projects/qr-compounds/releases/cloud.firestore/(default)","rulesetName":"projects/qr-compounds/rulesets/b29c373d-f57d-4de0-95d2-98139a7e4b5c"}}
+[debug] [2025-09-20T13:56:26.800Z] <<< [apiv2][status] PATCH https://firebaserules.googleapis.com/v1/projects/qr-compounds/releases/cloud.firestore/(default) 200

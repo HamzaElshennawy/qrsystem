@@ -42,21 +42,22 @@ function TestOwnerCreationContent() {
             }
 
             // Update the compound ID
-            const ownerData = {
+            const userData = {
                 ...newOwner,
                 compoundId: selectedCompound.id!,
+                type: "owner" as const,
                 isActive: true,
             };
 
-            console.log("Attempting to create owner with data:", ownerData);
+            console.log("Attempting to create user with data:", userData);
 
-            // Test creating an owner
-            const ownerId = await firestoreService.owners.create(ownerData);
-            setResult(`Successfully created owner with ID: ${ownerId}`);
+            // Test creating a user
+            const userId = await firestoreService.users.create(userData);
+            setResult(`Successfully created user with ID: ${userId}`);
 
-            // Clean up - delete the test owner
-            await firestoreService.delete("owners", ownerId);
-            setResult((prev) => prev + "\nTest owner cleaned up successfully.");
+            // Clean up - delete the test user
+            await firestoreService.delete("users", userId);
+            setResult((prev) => prev + "\nTest user cleaned up successfully.");
         } catch (error: any) {
             console.error("Owner Creation Test Error:", error);
             setResult(
@@ -84,12 +85,12 @@ function TestOwnerCreationContent() {
                 selectedCompound.id
             );
 
-            // Test reading owners
-            const owners = await firestoreService.owners.getByCompound(
+            // Test reading users
+            const users = await firestoreService.users.getByCompound(
                 selectedCompound.id!
             );
             setResult(
-                `Successfully read ${owners.length} owners for compound ${selectedCompound.name}`
+                `Successfully read ${users.length} users for compound ${selectedCompound.name}`
             );
         } catch (error: any) {
             console.error("Owner Read Test Error:", error);

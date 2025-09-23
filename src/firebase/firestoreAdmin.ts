@@ -1,20 +1,8 @@
-import {
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    addDoc,
-    updateDoc,
-    deleteDoc,
-    query,
-    where,
-    orderBy,
-    QueryConstraint,
-    Timestamp,
-} from "firebase/firestore";
-import { db } from "./firebaseConfig";
+import { adminDb } from "./firebaseAdmin";
+import { Timestamp } from "firebase-admin/firestore";
+import * as admin from "firebase-admin";
 
-// Type definitions for Firestore collections
+// Type definitions for Firestore collections (same as client-side)
 export interface Compound {
     id?: string;
     name: string;
@@ -79,18 +67,20 @@ export interface EntryPoint {
     };
 }
 
-export const firestoreService = {
+export const firestoreAdminService = {
     // Generic CRUD operations
     create: async <T>(
         collectionName: string,
         data: Omit<T, "id" | "createdAt" | "updatedAt">
     ): Promise<string> => {
         try {
-            const docRef = await addDoc(collection(db, collectionName), {
+            const docRef = adminDb.collection(collectionName).doc();
+            const docData = {
                 ...data,
                 createdAt: Timestamp.now(),
                 updatedAt: Timestamp.now(),
-            });
+            };
+            await docRef.set(docData);
             return docRef.id;
         } catch (error) {
             throw error;
@@ -102,10 +92,10 @@ export const firestoreService = {
         docId: string
     ): Promise<T | null> => {
         try {
-            const docRef = doc(db, collectionName, docId);
-            const docSnap = await getDoc(docRef);
+            const docRef = adminDb.collection(collectionName).doc(docId);
+            const docSnap = await docRef.get();
 
-            if (docSnap.exists()) {
+            if (docSnap.exists) {
                 return { id: docSnap.id, ...docSnap.data() } as T;
             }
             return null;
@@ -120,8 +110,8 @@ export const firestoreService = {
         data: Partial<T>
     ): Promise<void> => {
         try {
-            const docRef = doc(db, collectionName, docId);
-            await updateDoc(docRef, {
+            const docRef = adminDb.collection(collectionName).doc(docId);
+            await docRef.update({
                 ...data,
                 updatedAt: Timestamp.now(),
             });
@@ -132,8 +122,8 @@ export const firestoreService = {
 
     delete: async (collectionName: string, docId: string): Promise<void> => {
         try {
-            const docRef = doc(db, collectionName, docId);
-            await deleteDoc(docRef);
+            const docRef = adminDb.collection(collectionName).doc(docId);
+            await docRef.delete();
         } catch (error) {
             throw error;
         }
@@ -141,12 +131,24 @@ export const firestoreService = {
 
     query: async <T>(
         collectionName: string,
-        constraints: QueryConstraint[] = []
+        constraints: {
+            field: string;
+            op: admin.firestore.WhereFilterOp;
+            value: unknown;
+        }[] = []
     ): Promise<T[]> => {
         try {
-            const q = query(collection(db, collectionName), ...constraints);
-            const querySnapshot = await getDocs(q);
+            let query: admin.firestore.Query =
+                adminDb.collection(collectionName);
+            constraints.forEach((constraint) => {
+                query = query.where(
+                    constraint.field,
+                    constraint.op,
+                    constraint.value
+                );
+            });
 
+            const querySnapshot = await query.get();
             return querySnapshot.docs.map((doc) => ({
                 id: doc.id,
                 ...doc.data(),
@@ -161,47 +163,31 @@ export const firestoreService = {
         create: async (
             data: Omit<Compound, "id" | "createdAt" | "updatedAt">
         ): Promise<string> => {
-            return firestoreService.create<Compound>("compounds", data);
+            return firestoreAdminService.create<Compound>("compounds", data);
         },
 
         getByAdmin: async (adminId: string): Promise<Compound[]> => {
             try {
-                console.log("Querying compounds for admin:", adminId);
-                // Try with orderBy first
-                const result = await firestoreService.query<Compound>(
+                const compounds = await firestoreAdminService.query<Compound>(
                     "compounds",
-                    [
-                        where("adminId", "==", adminId),
-                        orderBy("createdAt", "desc"),
-                    ]
+                    [{ field: "adminId", op: "==", value: adminId }]
                 );
-                console.log("Query result:", result);
-                return result;
+                // Sort manually since admin SDK doesn't have orderBy in the same way
+                return compounds.sort((a, b) => {
+                    const aTime = a.createdAt?.toDate().getTime() || 0;
+                    const bTime = b.createdAt?.toDate().getTime() || 0;
+                    return bTime - aTime; // Descending order
+                });
             } catch (error) {
-                console.error("Error in getByAdmin with orderBy:", error);
-                // Fallback to simple query without orderBy
-                try {
-                    console.log("Trying fallback query without orderBy...");
-                    const result = await firestoreService.query<Compound>(
-                        "compounds",
-                        [where("adminId", "==", adminId)]
-                    );
-                    console.log("Fallback query result:", result);
-                    // Sort manually in JavaScript
-                    return result.sort((a, b) => {
-                        const aTime = a.createdAt?.toDate().getTime() || 0;
-                        const bTime = b.createdAt?.toDate().getTime() || 0;
-                        return bTime - aTime; // Descending order
-                    });
-                } catch (fallbackError) {
-                    console.error("Fallback query also failed:", fallbackError);
-                    throw fallbackError;
-                }
+                throw error;
             }
         },
 
         getById: async (compoundId: string): Promise<Compound | null> => {
-            return firestoreService.read<Compound>("compounds", compoundId);
+            return firestoreAdminService.read<Compound>(
+                "compounds",
+                compoundId
+            );
         },
     },
 
@@ -210,14 +196,14 @@ export const firestoreService = {
         create: async (
             data: Omit<User, "id" | "createdAt" | "updatedAt">
         ): Promise<string> => {
-            return firestoreService.create<User>("users", data);
+            return firestoreAdminService.create<User>("users", data);
         },
 
         getByCompound: async (compoundId: string): Promise<User[]> => {
-            const users = await firestoreService.query<User>("users", [
-                where("compoundId", "==", compoundId),
+            const users = await firestoreAdminService.query<User>("users", [
+                { field: "compoundId", op: "==", value: compoundId },
             ]);
-            // Sort manually to avoid index issues
+            // Sort manually
             return users.sort((a, b) => {
                 const aTime = a.createdAt?.toDate().getTime() || 0;
                 const bTime = b.createdAt?.toDate().getTime() || 0;
@@ -226,7 +212,7 @@ export const firestoreService = {
         },
 
         getById: async (userId: string): Promise<User | null> => {
-            return firestoreService.read<User>("users", userId);
+            return firestoreAdminService.read<User>("users", userId);
         },
 
         bulkCreate: async (
@@ -236,7 +222,7 @@ export const firestoreService = {
 
             for (const user of users) {
                 // Create each user and collect the actual ID
-                const userId = await firestoreService.create<User>(
+                const userId = await firestoreAdminService.create<User>(
                     "users",
                     user
                 );
@@ -252,14 +238,15 @@ export const firestoreService = {
         create: async (
             data: Omit<QRCode, "id" | "createdAt" | "updatedAt">
         ): Promise<string> => {
-            return firestoreService.create<QRCode>("qrcodes", data);
+            return firestoreAdminService.create<QRCode>("qrcodes", data);
         },
 
         getByCompound: async (compoundId: string): Promise<QRCode[]> => {
-            const qrCodes = await firestoreService.query<QRCode>("qrcodes", [
-                where("compoundId", "==", compoundId),
-            ]);
-            // Sort manually to avoid index issues
+            const qrCodes = await firestoreAdminService.query<QRCode>(
+                "qrcodes",
+                [{ field: "compoundId", op: "==", value: compoundId }]
+            );
+            // Sort manually
             return qrCodes.sort((a, b) => {
                 const aTime = a.createdAt?.toDate().getTime() || 0;
                 const bTime = b.createdAt?.toDate().getTime() || 0;
@@ -268,8 +255,8 @@ export const firestoreService = {
         },
 
         getByOwner: async (ownerId: string): Promise<QRCode[]> => {
-            return firestoreService.query<QRCode>("qrcodes", [
-                where("ownerId", "==", ownerId),
+            return firestoreAdminService.query<QRCode>("qrcodes", [
+                { field: "ownerId", op: "==", value: ownerId },
             ]);
         },
     },
@@ -279,15 +266,18 @@ export const firestoreService = {
         create: async (
             data: Omit<EntryPoint, "id" | "createdAt" | "updatedAt">
         ): Promise<string> => {
-            return firestoreService.create<EntryPoint>("entryPoints", data);
+            return firestoreAdminService.create<EntryPoint>(
+                "entryPoints",
+                data
+            );
         },
 
         getByCompound: async (compoundId: string): Promise<EntryPoint[]> => {
-            const entryPoints = await firestoreService.query<EntryPoint>(
+            const entryPoints = await firestoreAdminService.query<EntryPoint>(
                 "entryPoints",
-                [where("compoundId", "==", compoundId)]
+                [{ field: "compoundId", op: "==", value: compoundId }]
             );
-            // Sort manually to avoid index issues
+            // Sort manually
             return entryPoints.sort((a, b) => {
                 const aTime = a.createdAt?.toDate().getTime() || 0;
                 const bTime = b.createdAt?.toDate().getTime() || 0;

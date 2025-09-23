@@ -34,7 +34,7 @@ import {
     firestoreService,
     type EntryPoint,
     type Compound,
-    type Owner,
+    type User,
 } from "@/firebase/firestore";
 import { authService } from "@/firebase/auth";
 
@@ -81,7 +81,7 @@ export default function EntryPointsPage() {
     const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
     const [settingsEntryPoint, setSettingsEntryPoint] =
         useState<EntryPoint | null>(null);
-    const [compoundOwners, setCompoundOwners] = useState<Owner[]>([]);
+    const [compoundUsers, setCompoundUsers] = useState<User[]>([]);
     const [selectedOwners, setSelectedOwners] = useState<string[]>([]);
 
     useEffect(() => {
@@ -220,10 +220,10 @@ export default function EntryPointsPage() {
         const loadOwnersForSettings = async () => {
             if (isSettingsDialogOpen && settingsEntryPoint?.compoundId) {
                 try {
-                    const owners = await firestoreService.owners.getByCompound(
+                    const users = await firestoreService.users.getByCompound(
                         settingsEntryPoint.compoundId
                     );
-                    setCompoundOwners(owners);
+                    setCompoundUsers(users);
                 } catch (error) {
                     console.error("Error loading owners for settings:", error);
                 }
@@ -681,7 +681,7 @@ export default function EntryPointsPage() {
                     if (!open) {
                         setSelectedOwners([]);
                         setSettingsEntryPoint(null);
-                        setCompoundOwners([]);
+                        setCompoundUsers([]);
                     }
                 }}
             >
@@ -719,40 +719,40 @@ export default function EntryPointsPage() {
                                     </Badge>
                                 </div>
                                 <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-2">
-                                    {compoundOwners.length > 0 ? (
-                                        compoundOwners.map((owner) => (
+                                    {compoundUsers.length > 0 ? (
+                                        compoundUsers.map((user) => (
                                             <div
-                                                key={owner.id}
+                                                key={user.id}
                                                 className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded cursor-pointer"
                                                 onClick={() =>
-                                                    toggleOwner(owner.id!)
+                                                    toggleOwner(user.id!)
                                                 }
                                             >
                                                 <input
-                                                    title="allowowner"
+                                                    title="allowuser"
                                                     type="checkbox"
                                                     checked={selectedOwners.includes(
-                                                        owner.id!
+                                                        user.id!
                                                     )}
                                                     onChange={() =>
-                                                        toggleOwner(owner.id!)
+                                                        toggleOwner(user.id!)
                                                     }
                                                     className="rounded"
                                                 />
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-sm font-medium truncate">
-                                                        {owner.firstName}{" "}
-                                                        {owner.lastName}
+                                                        {user.firstName}{" "}
+                                                        {user.lastName}
                                                     </p>
-                                                    {owner.propertyUnit && (
+                                                    {user.propertyUnit && (
                                                         <p className="text-xs text-muted-foreground truncate">
                                                             Unit:{" "}
-                                                            {owner.propertyUnit}
+                                                            {user.propertyUnit}
                                                         </p>
                                                     )}
-                                                    {owner.email && (
+                                                    {user.email && (
                                                         <p className="text-xs text-muted-foreground truncate">
-                                                            {owner.email}
+                                                            {user.email}
                                                         </p>
                                                     )}
                                                 </div>
@@ -780,7 +780,7 @@ export default function EntryPointsPage() {
                                     setIsSettingsDialogOpen(false);
                                     setSelectedOwners([]);
                                     setSettingsEntryPoint(null);
-                                    setCompoundOwners([]);
+                                    setCompoundUsers([]);
                                 }}
                             >
                                 Cancel

@@ -92,11 +92,11 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Get the owner
-        const owner = await firestoreService.owners.getById(ownerId);
-        if (!owner || owner.compoundId !== compoundId) {
+        // Get the user
+        const user = await firestoreService.users.getById(ownerId);
+        if (!user || user.compoundId !== compoundId) {
             return NextResponse.json(
-                { error: "Owner not found" },
+                { error: "User not found" },
                 { status: 404 }
             );
         }
@@ -107,14 +107,14 @@ export async function POST(request: NextRequest) {
         );
         if (existingQrCodes.length > 0) {
             return NextResponse.json(
-                { error: "QR code already exists for this owner" },
+                { error: "QR code already exists for this user" },
                 { status: 400 }
             );
         }
 
         // Generate QR code
         const qrCodeId = await qrService.createAndSaveQRCode(
-            owner,
+            user,
             compoundId,
             currentUser.uid
         );

@@ -38,15 +38,16 @@ function TestQRContent() {
 
             setResult("🔍 Testing QR generation...\n\n");
 
-            // Create a test owner object
-            const testOwner = {
-                id: "test-owner-" + Date.now(),
+            // Create a test user object
+            const testUser = {
+                id: "test-user-" + Date.now(),
                 firstName: testData.firstName,
                 lastName: testData.lastName,
                 email: testData.email,
                 phone: testData.phone,
                 propertyUnit: testData.propertyUnit,
                 compoundId: selectedCompound.id!,
+                type: "owner" as const,
                 isActive: true,
                 createdAt: Timestamp.now(),
                 updatedAt: Timestamp.now(),
@@ -54,8 +55,8 @@ function TestQRContent() {
 
             // Test 1: Generate QR data URL
             try {
-                const qrResult = await qrService.generateOwnerQRCode(
-                    testOwner,
+                const qrResult = await qrService.generateUserQRCode(
+                    testUser,
                     selectedCompound.id!
                 );
                 setResult(
@@ -77,10 +78,10 @@ function TestQRContent() {
             // Test 2: Test buffer generation
             try {
                 const bufferResult = await qrService.generateQRCodeBuffer({
-                    ownerId: testOwner.id,
+                    ownerId: testUser.id,
                     compoundId: selectedCompound.id!,
-                    ownerName: `${testOwner.firstName} ${testOwner.lastName}`,
-                    propertyUnit: testOwner.propertyUnit,
+                    ownerName: `${testUser.firstName} ${testUser.lastName}`,
+                    propertyUnit: testUser.propertyUnit,
                     timestamp: Date.now(),
                     signature: "test-signature",
                 });

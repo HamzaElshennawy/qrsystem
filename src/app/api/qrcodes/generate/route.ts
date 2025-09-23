@@ -36,24 +36,24 @@ export async function POST(request: NextRequest) {
         let qrCodeIds = [];
 
         if (ownerIds && ownerIds.length > 0) {
-            // Generate QR codes for specific owners
+            // Generate QR codes for specific users
             for (const ownerId of ownerIds) {
-                const owner = await firestoreService.owners.getById(ownerId);
-                if (owner && owner.compoundId === compoundId) {
-                    owners.push(owner);
+                const user = await firestoreService.users.getById(ownerId);
+                if (user && user.compoundId === compoundId) {
+                    owners.push(user);
                 }
             }
         } else {
-            // Generate QR codes for all owners without QR codes
-            const allOwners = await firestoreService.owners.getByCompound(
+            // Generate QR codes for all users without QR codes
+            const allUsers = await firestoreService.users.getByCompound(
                 compoundId
             );
             const existingQrCodes =
                 await firestoreService.qrCodes.getByCompound(compoundId);
             const existingOwnerIds = existingQrCodes.map((qr) => qr.ownerId);
 
-            owners = allOwners.filter(
-                (owner) => !existingOwnerIds.includes(owner.id!)
+            owners = allUsers.filter(
+                (user) => !existingOwnerIds.includes(user.id!)
             );
         }
 

@@ -40,11 +40,7 @@ import {
     Filter,
     Users,
 } from "lucide-react";
-import {
-    firestoreService,
-    type QRCode,
-    type Owner,
-} from "@/firebase/firestore";
+import { firestoreService, type QRCode, type User } from "@/firebase/firestore";
 import { qrService } from "@/firebase/qr";
 import { authService } from "@/firebase/auth";
 import { useCompound } from "@/contexts/CompoundContext";
@@ -53,7 +49,7 @@ import Image from "next/image";
 export default function QRCodesPage() {
     const { selectedCompound } = useCompound();
     const [qrCodes, setQrCodes] = useState<QRCode[]>([]);
-    const [owners, setOwners] = useState<Owner[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
@@ -74,12 +70,12 @@ export default function QRCodesPage() {
         try {
             setLoading(true);
             // Load owners and QR codes for the selected compound only
-            const [compoundOwners, compoundQrCodes] = await Promise.all([
-                firestoreService.owners.getByCompound(selectedCompound.id!),
+            const [compoundUsers, compoundQrCodes] = await Promise.all([
+                firestoreService.users.getByCompound(selectedCompound.id!),
                 firestoreService.qrCodes.getByCompound(selectedCompound.id!),
             ]);
 
-            setOwners(compoundOwners);
+            setUsers(compoundUsers);
             setQrCodes(compoundQrCodes);
         } catch (error) {
             console.error("Error loading QR codes data:", error);
@@ -91,15 +87,18 @@ export default function QRCodesPage() {
     const handleGenerateQRCode = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const owner = owners.find((o) => o.id === selectedOwner);
-            if (!owner) return;
+            const user = users.find((u) => u.id === selectedOwner);
+            if (!user) {
+                alert("User not found");
+                return;
+            }
 
             const currentUser = authService.getCurrentUser();
             if (!currentUser) return;
 
             // Generate QR code
             await qrService.createAndSaveQRCode(
-                owner,
+                user,
                 selectedCompound!.id!,
                 currentUser.uid
             );
@@ -117,19 +116,19 @@ export default function QRCodesPage() {
             const currentUser = authService.getCurrentUser();
             if (!currentUser) return;
 
-            // Get owners without QR codes
-            const ownersWithoutQr = owners.filter(
-                (owner) => !qrCodes.some((qr) => qr.ownerId === owner.id)
+            // Get users without QR codes
+            const usersWithoutQr = users.filter(
+                (user) => !qrCodes.some((qr) => qr.ownerId === user.id)
             );
 
-            if (ownersWithoutQr.length === 0) {
-                alert("All owners already have QR codes!");
+            if (usersWithoutQr.length === 0) {
+                alert("All users already have QR codes!");
                 return;
             }
 
-            // Generate QR codes for owners without them
+            // Generate QR codes for users without them
             await qrService.bulkGenerateQRCodes(
-                ownersWithoutQr,
+                usersWithoutQr,
                 selectedCompound!.id!,
                 currentUser.uid
             );
@@ -143,11 +142,11 @@ export default function QRCodesPage() {
 
     const handlePreviewQR = async (ownerId: string) => {
         try {
-            const owner = owners.find((o) => o.id === ownerId);
-            if (!owner) return;
+            const user = users.find((u) => u.id === ownerId);
+            if (!user) return;
 
-            const qrResult = await qrService.generateOwnerQRCode(
-                owner,
+            const qrResult = await qrService.generateUserQRCode(
+                user,
                 selectedCompound!.id!
             );
             setPreviewQR(qrResult.dataURL);
@@ -158,18 +157,18 @@ export default function QRCodesPage() {
 
     const handleDownloadQR = async (qrCode: QRCode) => {
         try {
-            const owner = owners.find((o) => o.id === qrCode.ownerId);
-            if (!owner) return;
+            const user = users.find((u) => u.id === qrCode.ownerId);
+            if (!user) return;
 
-            const qrResult = await qrService.generateOwnerQRCode(
-                owner,
+            const qrResult = await qrService.generateUserQRCode(
+                user,
                 qrCode.compoundId
             );
 
             // Create download link
             const link = document.createElement("a");
             link.href = qrResult.dataURL;
-            link.download = `qr-${owner.firstName}-${owner.lastName}.png`;
+            link.download = `qr-${user.firstName}-${user.lastName}.png`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -179,24 +178,24 @@ export default function QRCodesPage() {
     };
 
     const filteredQrCodes = qrCodes.filter((qrCode) => {
-        const owner = owners.find((o) => o.id === qrCode.ownerId);
-        if (!owner) return false;
+        const user = users.find((u) => u.id === qrCode.ownerId);
+        if (!user) return false;
 
         const matchesSearch =
-            owner.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            owner.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             qrCode.ownerName.toLowerCase().includes(searchTerm.toLowerCase());
 
         return matchesSearch;
     });
 
-    const getOwnerName = (ownerId: string) => {
-        const owner = owners.find((o) => o.id === ownerId);
-        return owner ? `${owner.firstName} ${owner.lastName}` : "Unknown Owner";
+    const getUserName = (userId: string) => {
+        const user = users.find((u) => u.id === userId);
+        return user ? `${user.firstName} ${user.lastName}` : "Unknown User";
     };
 
-    const ownersWithoutQr = owners.filter(
-        (owner) => !qrCodes.some((qr) => qr.ownerId === owner.id)
+    const usersWithoutQr = users.filter(
+        (user) => !qrCodes.some((qr) => qr.ownerId === user.id)
     );
 
     if (loading) {
@@ -248,12 +247,10 @@ export default function QRCodesPage() {
                             <div className="space-y-4">
                                 <div className="p-4 bg-muted rounded-lg">
                                     <p className="text-sm">
-                                        <strong>
-                                            {ownersWithoutQr.length}
-                                        </strong>{" "}
+                                        <strong>{usersWithoutQr.length}</strong>{" "}
                                         owners don&apos;t have QR codes yet.
                                     </p>
-                                    {ownersWithoutQr.length > 0 && (
+                                    {usersWithoutQr.length > 0 && (
                                         <p className="text-xs text-muted-foreground mt-1">
                                             QR codes will be generated for all
                                             of them.
@@ -272,9 +269,9 @@ export default function QRCodesPage() {
                                     </Button>
                                     <Button
                                         onClick={handleBulkGenerate}
-                                        disabled={ownersWithoutQr.length === 0}
+                                        disabled={usersWithoutQr.length === 0}
                                     >
-                                        Generate {ownersWithoutQr.length} QR
+                                        Generate {usersWithoutQr.length} QR
                                         Codes
                                     </Button>
                                 </div>
@@ -321,13 +318,12 @@ export default function QRCodesPage() {
                                         <option value="">
                                             Choose an owner
                                         </option>
-                                        {owners.map((owner) => (
+                                        {users.map((user) => (
                                             <option
-                                                key={owner.id}
-                                                value={owner.id}
+                                                key={user.id}
+                                                value={user.id}
                                             >
-                                                {owner.firstName}{" "}
-                                                {owner.lastName}
+                                                {user.firstName} {user.lastName}
                                             </option>
                                         ))}
                                     </select>
@@ -389,7 +385,7 @@ export default function QRCodesPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {ownersWithoutQr.length}
+                            {usersWithoutQr.length}
                         </div>
                     </CardContent>
                 </Card>
@@ -474,7 +470,7 @@ export default function QRCodesPage() {
                                 {filteredQrCodes.map((qrCode) => (
                                     <TableRow key={qrCode.id}>
                                         <TableCell className="font-medium">
-                                            {getOwnerName(qrCode.ownerId)}
+                                            {getUserName(qrCode.ownerId)}
                                         </TableCell>
                                         <TableCell>
                                             <Badge

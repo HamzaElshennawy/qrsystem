@@ -16,10 +16,10 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
         const compoundId = searchParams.get("compoundId");
 
-        let owners = [];
+        let users = [];
 
         if (compoundId) {
-            // Get owners for a specific compound
+            // Get users for a specific compound
             const compound = await firestoreService.compounds.getById(
                 compoundId
             );
@@ -29,26 +29,26 @@ export async function GET(request: NextRequest) {
                     { status: 403 }
                 );
             }
-            owners = await firestoreService.owners.getByCompound(compoundId);
+            users = await firestoreService.users.getByCompound(compoundId);
         } else {
-            // Get owners for all compounds owned by the user
+            // Get users for all compounds owned by the user
             const compounds = await firestoreService.compounds.getByAdmin(
                 currentUser.uid
             );
-            const allOwners = [];
+            const allUsers = [];
 
             for (const compound of compounds) {
-                const compoundOwners =
-                    await firestoreService.owners.getByCompound(compound.id!);
-                allOwners.push(...compoundOwners);
+                const compoundUsers =
+                    await firestoreService.users.getByCompound(compound.id!);
+                allUsers.push(...compoundUsers);
             }
 
-            owners = allOwners;
+            users = allUsers;
         }
 
         return NextResponse.json({
             success: true,
-            owners,
+            users,
         });
     } catch (error: any) {
         console.error("Get owners error:", error);
@@ -69,13 +69,29 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const { firstName, lastName, email, phone, propertyUnit, compoundId } =
-            await request.json();
+        const {
+            firstName,
+            lastName,
+            email,
+            phone,
+            propertyUnit,
+            compoundId,
+            type,
+        } = await request.json();
 
-        if (!firstName || !lastName || !email || !compoundId) {
+        if (!firstName || !lastName || !email || !compoundId || !type) {
             return NextResponse.json(
                 {
-                    error: "Required fields: firstName, lastName, email, compoundId",
+                    error: "Required fields: firstName, lastName, email, compoundId, type",
+                },
+                { status: 400 }
+            );
+        }
+
+        if (!["owner", "employee", "manager"].includes(type)) {
+            return NextResponse.json(
+                {
+                    error: "Invalid user type. Must be owner, employee, or manager",
                 },
                 { status: 400 }
             );
@@ -90,8 +106,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const ownerData = {
+        const userData = {
             compoundId,
+            type,
             firstName,
             lastName,
             email,
@@ -100,12 +117,12 @@ export async function POST(request: NextRequest) {
             isActive: true,
         };
 
-        const ownerId = await firestoreService.owners.create(ownerData);
+        const userId = await firestoreService.users.create(userData);
 
         return NextResponse.json({
             success: true,
-            ownerId,
-            message: "Owner created successfully",
+            userId,
+            message: "User created successfully",
         });
     } catch (error: any) {
         console.error("Create owner error:", error);

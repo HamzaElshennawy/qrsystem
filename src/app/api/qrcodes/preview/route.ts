@@ -32,17 +32,17 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Get the owner
-        const owner = await firestoreService.owners.getById(ownerId);
-        if (!owner || owner.compoundId !== compoundId) {
+        // Get the user
+        const user = await firestoreService.users.getById(ownerId);
+        if (!user || user.compoundId !== compoundId) {
             return NextResponse.json(
-                { error: "Owner not found" },
+                { error: "User not found" },
                 { status: 404 }
             );
         }
 
         // Generate QR code preview
-        const qrResult = await qrService.generateOwnerQRCode(owner, compoundId);
+        const qrResult = await qrService.generateUserQRCode(user, compoundId);
 
         return NextResponse.json({
             success: true,

@@ -71,25 +71,24 @@ export default function TestPermissionsPage() {
                     currentUser.uid
                 );
                 if (compounds.length > 0) {
-                    const testOwner = {
+                    const testUser = {
                         firstName: "Test",
-                        lastName: "Owner",
+                        lastName: "User",
                         email: "test@example.com",
                         phone: "1234567890",
                         propertyUnit: "A1",
                         compoundId: compounds[0].id!,
+                        type: "owner" as const,
                         isActive: true,
                     };
-                    const ownerId = await firestoreService.owners.create(
-                        testOwner
+                    const userId = await firestoreService.users.create(
+                        testUser
                     );
-                    setResult(
-                        (prev) => prev + `✅ Owner created: ${ownerId}\n`
-                    );
+                    setResult((prev) => prev + `✅ User created: ${userId}\n`);
 
                     // Clean up
-                    await firestoreService.delete("owners", ownerId);
-                    setResult((prev) => prev + `✅ Test owner cleaned up\n`);
+                    await firestoreService.delete("users", userId);
+                    setResult((prev) => prev + `✅ Test user cleaned up\n`);
                 } else {
                     setResult(
                         (prev) =>
