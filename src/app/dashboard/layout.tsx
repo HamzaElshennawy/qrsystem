@@ -146,7 +146,7 @@ function DashboardContent({ children }: DashboardLayoutProps) {
     ];
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
             {/* Mobile sidebar overlay */}
             {sidebarOpen && (
                 <div
@@ -157,17 +157,17 @@ function DashboardContent({ children }: DashboardLayoutProps) {
 
             {/* Sidebar */}
             <div
-                className={`fixed inset-y-0  left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:inset-auto lg:flex-shrink-0 lg:h-screen lg:overflow-visible ${
+                className={`fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:ml-4 ${
                     sidebarOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
             >
-                <div className="h-[98vh] lg:my-[1vh] lg:ml-4 lg:mr-2">
+                <div className="h-full mr-2">
                     <div className="h-full bg-white/95 dark:bg-slate-800/95 rounded-2xl shadow-2xl border border-slate-200/20 dark:border-slate-700/30 backdrop-blur-xl ring-1 ring-slate-200/10 dark:ring-slate-700/20">
                         <div className="flex flex-col h-full">
                             {/* Section 1: Logo and Main Links */}
-                            <div className="flex flex-col flex-1">
+                            <div className="flex flex-col flex-1 min-h-0">
                                 {/* Logo Header */}
-                                <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200 dark:border-slate-700">
+                                <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
                                     <div className="flex items-center space-x-2">
                                         <QrCode className="h-8 w-8 text-blue-600" />
                                         <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
@@ -186,7 +186,7 @@ function DashboardContent({ children }: DashboardLayoutProps) {
 
                                 {/* Compound Dropdown */}
                                 <div
-                                    className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 relative"
+                                    className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 relative flex-shrink-0"
                                     data-compound-dropdown
                                 >
                                     <Button
@@ -278,7 +278,7 @@ function DashboardContent({ children }: DashboardLayoutProps) {
 
                                 {/* Main Navigation */}
                                 <nav className="mt-6 px-3 flex-1 overflow-y-auto">
-                                    <div className="space-y-1">
+                                    <div className="space-y-1 pb-4">
                                         {navigation.map((item) => {
                                             const Icon = item.icon;
                                             return (
@@ -297,7 +297,7 @@ function DashboardContent({ children }: DashboardLayoutProps) {
                             </div>
 
                             {/* Section 2: Sign Out and Related Links */}
-                            <div className="border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-b-2xl overflow-hidden">
+                            <div className="border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 rounded-b-2xl overflow-hidden flex-shrink-0">
                                 {/* User Profile */}
                                 <div className="p-4">
                                     <div className="flex items-center space-x-3 mb-4">
@@ -336,7 +336,7 @@ function DashboardContent({ children }: DashboardLayoutProps) {
             </div>
 
             {/* Main content */}
-            <div className="flex-1 min-w-0 lg:ml-2">
+            <div className="flex-1 min-w-0 lg:ml-[280px]">
                 {/* Top bar */}
                 <div className="sticky top-0 z-30 bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700">
                     <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">

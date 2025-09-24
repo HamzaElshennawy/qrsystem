@@ -207,49 +207,74 @@ export default function OwnersPage() {
         }
 
         try {
-            // Get the current user
-            const currentUser = authService.getCurrentUser();
-            if (!currentUser) {
-                alert("Please log in first");
+            // Verify ownership client-side
+            const compound = await firestoreService.compounds.getById(
+                selectedCompound.id!
+            );
+            if (!compound) {
+                alert("Compound not found");
+                return;
+            }
+            if (compound.adminId !== currentUser.uid) {
+                alert("You don't have permission to import users for this compound");
                 return;
             }
 
-            const uploadFormData = new FormData();
-            uploadFormData.append("file", file);
-            uploadFormData.append("compoundId", selectedCompound?.id || "");
-            uploadFormData.append("userId", currentUser.uid);
+            // Read CSV text
+            const csvText = await file.text();
 
-            console.log("Frontend: Sending to API:");
-            console.log("- File:", file.name, "Size:", file.size);
-            console.log("- CompoundId:", selectedCompound?.id);
-            console.log("- UserId:", currentUser.uid);
+            // Parse CSV (simple parser for comma-separated, no quotes/escapes)
+            const lines = csvText.trim().split("\n");
+            if (lines.length < 2) {
+                alert("CSV must have a header and at least one row");
+                return;
+            }
 
-            const response = await fetch("/api/owners/import", {
-                method: "POST",
-                body: uploadFormData,
+            const headers = lines[0].split(",").map((h) => h.trim().replace(/"/g, ""));
+            const required = ["firstName", "lastName", "email"];
+            for (const col of required) {
+                if (!headers.includes(col)) {
+                    alert(`Missing required column: ${col}. Found: ${headers.join(", ")}`);
+                    return;
+                }
+            }
+
+            const records: any[] = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(",").map((v) => v.trim().replace(/"/g, ""));
+                if (values.length !== headers.length) continue;
+                const rec: any = {};
+                headers.forEach((h, idx) => (rec[h] = values[idx]));
+                records.push(rec);
+            }
+
+            // Build user payloads
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const payload = records.map((r) => {
+                const typeRaw = (r.type || "owner").toString().trim().toLowerCase();
+                const type = ["owner", "employee", "manager"].includes(typeRaw)
+                    ? (typeRaw as "owner" | "employee" | "manager")
+                    : "owner";
+                const email = (r.email || "").toString().trim();
+                if (!emailRegex.test(email)) {
+                    throw new Error(`Invalid email: ${email}`);
+                }
+                return {
+                    compoundId: selectedCompound.id!,
+                    type,
+                    firstName: (r.firstName || "").toString().trim(),
+                    lastName: (r.lastName || "").toString().trim(),
+                    email,
+                    phone: (r.phone || "").toString().trim(),
+                    propertyUnit: (r.propertyUnit || "").toString().trim(),
+                    isActive: true,
+                } as any;
             });
 
-            console.log("Frontend: API response status:", response.status);
-
-            const result = await response.json();
-
-            console.log("Frontend: API response:", result);
-
-            if (result.success) {
-                alert(`Successfully imported ${result.count} users`);
-                loadData();
-            } else {
-                //let errorMessage = "Import failed";
-                //if (result.errors && result.errors.length > 0) {
-                //    errorMessage += `:\n${result.errors
-                //        .map((err: any) => `Row ${err.row}: ${err.error}`)
-                //        .join("\n")}`;
-                //} else if (result.error) {
-                //    errorMessage += `: ${result.error}`;
-                //}
-                //console.error("Frontend: Import error:", errorMessage);
-                //alert(errorMessage);
-            }
+            // Write to Firestore using client SDK (rules require auth)
+            const ids = await firestoreService.users.bulkCreate(payload);
+            alert(`Successfully imported ${ids.length} users`);
+            loadData();
         } catch (error) {
             console.error("CSV import error:", error);
             alert("Failed to import CSV file");

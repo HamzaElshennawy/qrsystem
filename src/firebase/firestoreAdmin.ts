@@ -1,6 +1,7 @@
-import { adminDb } from "./firebaseAdmin";
+import "server-only";
 import { Timestamp } from "firebase-admin/firestore";
 import * as admin from "firebase-admin";
+import { getAdminDb } from "./firebaseAdmin";
 
 // Type definitions for Firestore collections (same as client-side)
 export interface Compound {
@@ -74,7 +75,7 @@ export const firestoreAdminService = {
         data: Omit<T, "id" | "createdAt" | "updatedAt">
     ): Promise<string> => {
         try {
-            const docRef = adminDb.collection(collectionName).doc();
+            const docRef = getAdminDb().collection(collectionName).doc();
             const docData = {
                 ...data,
                 createdAt: Timestamp.now(),
@@ -92,7 +93,7 @@ export const firestoreAdminService = {
         docId: string
     ): Promise<T | null> => {
         try {
-            const docRef = adminDb.collection(collectionName).doc(docId);
+            const docRef = getAdminDb().collection(collectionName).doc(docId);
             const docSnap = await docRef.get();
 
             if (docSnap.exists) {
@@ -110,7 +111,7 @@ export const firestoreAdminService = {
         data: Partial<T>
     ): Promise<void> => {
         try {
-            const docRef = adminDb.collection(collectionName).doc(docId);
+            const docRef = getAdminDb().collection(collectionName).doc(docId);
             await docRef.update({
                 ...data,
                 updatedAt: Timestamp.now(),
@@ -122,7 +123,7 @@ export const firestoreAdminService = {
 
     delete: async (collectionName: string, docId: string): Promise<void> => {
         try {
-            const docRef = adminDb.collection(collectionName).doc(docId);
+            const docRef = getAdminDb().collection(collectionName).doc(docId);
             await docRef.delete();
         } catch (error) {
             throw error;
@@ -139,7 +140,7 @@ export const firestoreAdminService = {
     ): Promise<T[]> => {
         try {
             let query: admin.firestore.Query =
-                adminDb.collection(collectionName);
+                getAdminDb().collection(collectionName);
             constraints.forEach((constraint) => {
                 query = query.where(
                     constraint.field,
