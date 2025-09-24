@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { authService } from "@/firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/firebase/firebaseConfig";
 import { firestoreService } from "@/firebase/firestore";
 import { CompoundProvider, useCompound } from "@/contexts/CompoundContext";
 
@@ -41,14 +43,23 @@ function DashboardContent({ children }: DashboardLayoutProps) {
     const router = useRouter();
 
     useEffect(() => {
-        const currentUser = authService.getCurrentUser();
-        if (!currentUser) {
-            router.push("/login");
-        } else {
-            setUser(currentUser);
-            loadCompounds(currentUser.uid);
-            setLoading(false);
-        }
+        const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+            if (!firebaseUser) {
+                setUser(null);
+                setLoading(false);
+                router.push("/login");
+            } else {
+                const hydratedUser = {
+                    uid: firebaseUser.uid,
+                    email: firebaseUser.email,
+                    displayName: firebaseUser.displayName,
+                };
+                setUser(hydratedUser);
+                loadCompounds(firebaseUser.uid);
+                setLoading(false);
+            }
+        });
+        return () => unsubscribe();
     }, [router]);
 
     // Close dropdown when clicking outside

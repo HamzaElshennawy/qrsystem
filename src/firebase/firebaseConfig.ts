@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, browserLocalPersistence, setPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
@@ -22,6 +22,10 @@ if (getApps().length === 0) {
 
 // Initialize Firebase services
 export const auth = getAuth(app);
+// Ensure auth state persists across tabs and reloads
+setPersistence(auth, browserLocalPersistence).catch(() => {
+    // no-op: fallback to default persistence if setting fails
+});
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 

@@ -3,7 +3,8 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { firestoreService, type Compound } from '@/firebase/firestore';
-import { authService } from '@/firebase/auth';
+import { auth } from '@/firebase/firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
 
 interface CompoundContextType {
   selectedCompound: Compound | null;
@@ -55,18 +56,18 @@ export function CompoundProvider({ children }: { children: ReactNode }) {
   }, [searchParams, router]);
 
   useEffect(() => {
-    const checkAuthAndLoadCompound = async () => {
-      // Check if user is authenticated
-      const currentUser = authService.getCurrentUser();
-      if (!currentUser) {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        setSelectedCompound(null);
+        setLoading(false);
         router.push('/login');
         return;
       }
 
       await refreshCompound();
-    };
+    });
 
-    checkAuthAndLoadCompound();
+    return () => unsubscribe();
   }, [searchParams, router, refreshCompound]);
 
   const value: CompoundContextType = {
