@@ -30,6 +30,11 @@ export interface User {
     isActive: boolean;
     paymentStatus?: "paid" | "pending" | "overdue";
     lastPaymentDate?: Timestamp;
+    // Enhanced authentication fields
+    firebaseUid?: string;
+    hasPassword?: boolean;
+    passwordHash?: string; // Only stored on server-side
+    isFirstTimeLogin?: boolean;
     createdAt: Timestamp;
     updatedAt: Timestamp;
 }
@@ -66,6 +71,18 @@ export interface EntryPoint {
         allowGuests?: boolean;
         enforcePaymentStatus?: boolean;
     };
+}
+
+export interface DeviceSession {
+    id?: string;
+    userId: string;
+    deviceFingerprint: string;
+    userAgent: string;
+    ipAddress?: string;
+    lastUsedAt: Timestamp;
+    isActive: boolean;
+    createdAt: Timestamp;
+    updatedAt: Timestamp;
 }
 
 export const firestoreAdminService = {
@@ -284,6 +301,55 @@ export const firestoreAdminService = {
                 const bTime = b.createdAt?.toDate().getTime() || 0;
                 return bTime - aTime; // Descending order
             });
+        },
+    },
+
+    // Device session operations
+    deviceSessions: {
+        create: async (
+            data: Omit<DeviceSession, "id" | "createdAt" | "updatedAt">
+        ): Promise<string> => {
+            return firestoreAdminService.create<DeviceSession>("deviceSessions", data);
+        },
+
+        getByUserAndDevice: async (
+            userId: string,
+            deviceFingerprint: string
+        ): Promise<DeviceSession | null> => {
+            const results = await firestoreAdminService.query<DeviceSession>(
+                "deviceSessions",
+                [
+                    { field: "userId", op: "==", value: userId },
+                    { field: "deviceFingerprint", op: "==", value: deviceFingerprint },
+                ]
+            );
+            return results.length > 0 ? results[0] : null;
+        },
+
+        getByUser: async (userId: string): Promise<DeviceSession[]> => {
+            return firestoreAdminService.query<DeviceSession>(
+                "deviceSessions",
+                [{ field: "userId", op: "==", value: userId }]
+            );
+        },
+
+        updateLastUsed: async (
+            id: string
+        ): Promise<void> => {
+            await firestoreAdminService.update<DeviceSession>("deviceSessions", id, {
+                lastUsedAt: Timestamp.now(),
+            });
+        },
+
+        deactivateAll: async (userId: string): Promise<void> => {
+            const sessions = await firestoreAdminService.deviceSessions.getByUser(userId);
+            for (const session of sessions) {
+                if (session.id) {
+                    await firestoreAdminService.update<DeviceSession>("deviceSessions", session.id, {
+                        isActive: false,
+                    });
+                }
+            }
         },
     },
 };

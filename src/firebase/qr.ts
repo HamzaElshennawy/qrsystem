@@ -8,6 +8,11 @@ export interface QRCodeData {
     propertyUnit?: string;
     timestamp: number;
     signature: string;
+    guestName?: string;
+    guestPhone?: string;
+    purpose?: string;
+    expirationTime?: number;
+    isGuest?: boolean;
 }
 
 export const qrService = {
