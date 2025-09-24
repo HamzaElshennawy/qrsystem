@@ -79,6 +79,24 @@ export interface EntryPoint {
     };
 }
 
+export interface OwnerInvite {
+    id?: string;
+    token: string;
+    compoundId: string;
+    phone: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    propertyUnit?: string;
+    status: "pending" | "accepted" | "expired" | "revoked";
+    createdBy: string; // admin uid
+    acceptedByUid?: string; // auth uid of owner
+    acceptedAt?: Timestamp;
+    expiresAt?: Timestamp;
+    createdAt: Timestamp;
+    updatedAt: Timestamp;
+}
+
 export const firestoreService = {
     // Generic CRUD operations
     create: async <T>(
@@ -210,6 +228,16 @@ export const firestoreService = {
         create: async (
             data: Omit<User, "id" | "createdAt" | "updatedAt">
         ): Promise<string> => {
+            // Enforce unique phone when provided (global uniqueness)
+            const phone = (data as any).phone?.toString().trim();
+            if (phone) {
+                const existing = await firestoreService.query<User>("users", [
+                    where("phone", "==", phone),
+                ]);
+                if (existing.length > 0) {
+                    throw new Error(`Phone number already in use: ${phone}`);
+                }
+            }
             return firestoreService.create<User>("users", data);
         },
 
@@ -234,16 +262,30 @@ export const firestoreService = {
         ): Promise<string[]> => {
             const ids: string[] = [];
 
+            // Intra-payload duplicate phone detection
+            const seenPhones = new Set<string>();
+            for (const u of users) {
+                const phone = (u as any).phone?.toString().trim();
+                if (phone) {
+                    const key = phone;
+                    if (seenPhones.has(key)) {
+                        throw new Error(`Duplicate phone in CSV/import: ${phone}`);
+                    }
+                    seenPhones.add(key);
+                }
+            }
+
             for (const user of users) {
-                // Create each user and collect the actual ID
-                const userId = await firestoreService.create<User>(
-                    "users",
-                    user
-                );
+                // Enforce global uniqueness per create()
+                const userId = await firestoreService.users.create(user);
                 ids.push(userId);
             }
 
             return ids;
+        },
+
+        getByPhone: async (phone: string): Promise<User[]> => {
+            return firestoreService.query<User>("users", [where("phone", "==", phone.trim())]);
         },
     },
 
@@ -292,6 +334,38 @@ export const firestoreService = {
                 const aTime = a.createdAt?.toDate().getTime() || 0;
                 const bTime = b.createdAt?.toDate().getTime() || 0;
                 return bTime - aTime; // Descending order
+            });
+        },
+    },
+
+
+    // Owner invite operations
+    ownerInvites: {
+        create: async (
+            data: Omit<OwnerInvite, "id" | "status" | "createdAt" | "updatedAt">
+        ): Promise<string> => {
+            return firestoreService.create<OwnerInvite>("ownerInvites", {
+                ...data,
+                status: "pending",
+            });
+        },
+
+        getByToken: async (token: string): Promise<OwnerInvite | null> => {
+            const results = await firestoreService.query<OwnerInvite>(
+                "ownerInvites",
+                [where("token", "==", token)]
+            );
+            return results.length > 0 ? results[0] : null;
+        },
+
+        markAccepted: async (
+            id: string,
+            acceptedByUid: string
+        ): Promise<void> => {
+            await firestoreService.update<OwnerInvite>("ownerInvites", id, {
+                status: "accepted",
+                acceptedByUid,
+                acceptedAt: Timestamp.now(),
             });
         },
     },

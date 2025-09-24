@@ -7,6 +7,7 @@ import {
     updateProfile,
 } from "firebase/auth";
 import { auth } from "./firebaseConfig";
+import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
 
 export interface AuthUser extends User {
     displayName: string | null;
@@ -66,5 +67,19 @@ export const authService = {
     // Check if user is authenticated
     isAuthenticated: (): boolean => {
         return !!auth.currentUser;
+    },
+
+    // Phone OTP: initialize reCAPTCHA verifier (to be called on client before sending OTP)
+    initRecaptcha: (containerId: string = "recaptcha-container"): RecaptchaVerifier => {
+        const verifier = new RecaptchaVerifier(auth, containerId, { size: "invisible" });
+        return verifier;
+    },
+
+    sendOtp: async (phoneNumber: string, verifier: RecaptchaVerifier): Promise<ConfirmationResult> => {
+        return await signInWithPhoneNumber(auth, phoneNumber, verifier);
+    },
+
+    confirmOtp: async (confirmation: ConfirmationResult, code: string) => {
+        return await confirmation.confirm(code);
     },
 };

@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { PhoneInput } from "@/components/ui/phone-input";
 import {
     Dialog,
     DialogContent,
@@ -51,6 +52,7 @@ export default function OwnersPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+    // Self registration removed
     const [newUser, setNewUser] = useState({
         firstName: "",
         lastName: "",
@@ -82,6 +84,7 @@ export default function OwnersPage() {
                 selectedCompound.id!
             );
             setUsers(compoundUsers);
+            // no-op
         } catch (error) {
             console.error("Error loading owners data:", error);
         } finally {
@@ -112,7 +115,33 @@ export default function OwnersPage() {
                 userData.lastPaymentDate = newUser.lastPaymentDate;
             }
 
+            // Create user record
+            // Check for duplicate phone before creating
+            if (newUser.phone) {
+                const dup = await firestoreService.users.getByPhone(newUser.phone);
+                if (dup.length > 0) {
+                    alert("Phone number already in use");
+                    return;
+                }
+            }
             await firestoreService.users.create(userData);
+            // Auto-create invite for phone login if phone provided
+            if (newUser.phone) {
+                const currentUser = authService.getCurrentUser();
+                const idToken = currentUser ? await currentUser.getIdToken() : '';
+                await fetch('/api/owners/invites', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                    body: JSON.stringify({
+                        compoundId: selectedCompound?.id,
+                        phone: newUser.phone,
+                        email: newUser.email,
+                        firstName: newUser.firstName,
+                        lastName: newUser.lastName,
+                        propertyUnit: newUser.propertyUnit,
+                    }),
+                });
+            }
             setNewUser({
                 firstName: "",
                 lastName: "",
@@ -134,6 +163,31 @@ export default function OwnersPage() {
     const openEditDialog = (user: User) => {
         setEditingUser(user);
         setIsEditDialogOpen(true);
+    };
+
+    const handleDeleteUser = async (user: User) => {
+        if (!user?.id) return;
+        const confirmed = window.confirm(
+            `Delete ${user.firstName} ${user.lastName}? This will remove the user and their QR codes.`
+        );
+        if (!confirmed) return;
+        try {
+            // Delete related QR codes first
+            const ownerQrCodes = await firestoreService.qrCodes.getByOwner(
+                user.id
+            );
+            for (const qr of ownerQrCodes) {
+                if (qr.id) {
+                    await firestoreService.delete("qrcodes", qr.id);
+                }
+            }
+            // Delete the user
+            await firestoreService.delete("users", user.id);
+            await loadData();
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            alert("Failed to delete user. Please try again.");
+        }
     };
 
     const handleUpdateUser = async (e: React.FormEvent) => {
@@ -467,13 +521,12 @@ export default function OwnersPage() {
                                     <Label htmlFor="phone">
                                         Phone (Optional)
                                     </Label>
-                                    <Input
-                                        id="phone"
+                                    <PhoneInput
                                         value={newUser.phone}
-                                        onChange={(e) =>
+                                        onChange={(value) =>
                                             setNewUser({
                                                 ...newUser,
-                                                phone: e.target.value,
+                                                phone: value,
                                             })
                                         }
                                     />
@@ -659,15 +712,14 @@ export default function OwnersPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="editPhone">Phone</Label>
-                                    <Input
-                                        id="editPhone"
+                                    <PhoneInput
                                         value={editingUser?.phone || ""}
-                                        onChange={(e) =>
+                                        onChange={(value) =>
                                             setEditingUser((prev) =>
                                                 prev
                                                     ? {
                                                           ...prev,
-                                                          phone: e.target.value,
+                                                          phone: value,
                                                       }
                                                     : null
                                             )
@@ -874,6 +926,12 @@ export default function OwnersPage() {
                                 className="bg-gray-50"
                             />
                         </div>
+                        <div className="sm:w-48">
+                            <Label>Owner Links</Label>
+                            <div className="flex flex-col gap-2 text-sm">
+                                <a className="underline" href="/owner/login" target="_blank" rel="noreferrer">Owner Portal Login</a>
+                            </div>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
@@ -972,6 +1030,7 @@ export default function OwnersPage() {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
+                                                    onClick={() => handleDeleteUser(user)}
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
@@ -1004,6 +1063,8 @@ export default function OwnersPage() {
                     )}
                 </CardContent>
             </Card>
+
+            {/* Self-registration removed */}
         </div>
     );
 }

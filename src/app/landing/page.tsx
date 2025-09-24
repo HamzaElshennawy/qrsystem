@@ -19,11 +19,11 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="flex items-center space-x-4">
-            <Link href="/login">
-              <Button variant="ghost">Sign In</Button>
+            <Link href="/owner/login">
+              <Button variant="ghost">Owner Portal</Button>
             </Link>
             <Link href="/login">
-              <Button>Get Started</Button>
+              <Button>Admin Sign In</Button>
             </Link>
           </div>
         </div>
@@ -44,15 +44,17 @@ export default function LandingPage() {
             QR code management system designed for residential compounds.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/login">
+            <Link href="/owner/login">
               <Button size="lg" className="w-full sm:w-auto">
-                Get Started Free
+                Owner Portal Login
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="w-full sm:w-auto">
-              Watch Demo
-            </Button>
+            <Link href="/login">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                Admin Get Started
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -161,11 +163,18 @@ export default function LandingPage() {
               <p className="text-slate-600 dark:text-slate-400 mb-6">
                 Join hundreds of compounds already using our system
               </p>
-              <Link href="/login">
-                <Button size="lg" className="w-full">
-                  Start Your Free Trial
-                </Button>
-              </Link>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Link href="/owner/login">
+                  <Button size="lg" className="w-full">
+                    Owner Portal Login
+                  </Button>
+                </Link>
+                <Link href="/login">
+                  <Button size="lg" variant="secondary" className="w-full">
+                    Admin Get Started
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -178,12 +187,19 @@ export default function LandingPage() {
           <p className="text-xl mb-8 opacity-90">
             Join the future of secure property access management
           </p>
-          <Link href="/login">
-            <Button size="lg" variant="secondary">
-              Get Started Today
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/owner/login">
+              <Button size="lg" variant="secondary">
+                Owner Portal Login
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/login">
+              <Button size="lg" variant="outline">
+                Admin Get Started
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

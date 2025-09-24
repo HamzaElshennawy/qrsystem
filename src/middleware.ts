@@ -9,6 +9,7 @@ export function middleware(request: NextRequest) {
     '/',
     '/landing',
     '/login',
+    '/owner/login',
     '/api/auth/login',
     '/api/auth/signup',
   ];
