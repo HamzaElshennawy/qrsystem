@@ -39,6 +39,7 @@ import {
     User,
     Building,
     Home,
+    Trash2,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -102,6 +103,13 @@ export default function OwnerDashboardPage() {
         propertyUnit: "",
         compoundId: "",
     });
+
+    // Delete confirmation dialog
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [qrCodeToDelete, setQrCodeToDelete] = useState<GuestQRCode | null>(
+        null
+    );
+    const [deletingQR, setDeletingQR] = useState(false);
 
     const loadAvailableCompounds = async () => {
         try {
@@ -330,6 +338,55 @@ export default function OwnerDashboardPage() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    };
+
+    const openDeleteDialog = (qrCode: GuestQRCode) => {
+        setQrCodeToDelete(qrCode);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDeleteGuestQRCode = async () => {
+        if (!qrCodeToDelete) return;
+
+        try {
+            setDeletingQR(true);
+            const user = authService.getCurrentUser();
+            if (!user) {
+                alert("Please log in to delete QR codes");
+                return;
+            }
+
+            // Build query parameters for authentication
+            const params = new URLSearchParams();
+            if (user.phoneNumber)
+                params.append("phoneNumber", user.phoneNumber);
+            if (user.email) params.append("email", user.email);
+            if (user.uid) params.append("uid", user.uid);
+
+            const response = await fetch(
+                `/api/owner/qr/guest/${qrCodeToDelete.id}?${params.toString()}`,
+                {
+                    method: "DELETE",
+                }
+            );
+
+            if (response.ok) {
+                // Remove the QR code from the state
+                setGuestQRCodes((prev) =>
+                    prev.filter((qr) => qr.id !== qrCodeToDelete.id)
+                );
+                setDeleteDialogOpen(false);
+                setQrCodeToDelete(null);
+            } else {
+                const error = await response.json();
+                alert(`Error: ${error.error}`);
+            }
+        } catch (error) {
+            console.error("Error deleting guest QR code:", error);
+            alert("Failed to delete guest QR code");
+        } finally {
+            setDeletingQR(false);
+        }
     };
 
     const createOwnerProfile = async () => {
@@ -879,19 +936,32 @@ export default function OwnerDashboardPage() {
                                                     ).toLocaleString()}
                                                 </p>
                                             </div>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="ml-2 flex-shrink-0"
-                                                onClick={() =>
-                                                    downloadQRCode(
-                                                        guestQR.dataURL,
-                                                        `guest-qr-${guestQR.guestName}.png`
-                                                    )
-                                                }
-                                            >
-                                                Download
-                                            </Button>
+                                            <div className="flex gap-2 ml-2 flex-shrink-0">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        downloadQRCode(
+                                                            guestQR.dataURL,
+                                                            `guest-qr-${guestQR.guestName}.png`
+                                                        )
+                                                    }
+                                                >
+                                                    Download
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                    onClick={() =>
+                                                        openDeleteDialog(
+                                                            guestQR
+                                                        )
+                                                    }
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
                                         </div>
 
                                         <div className="flex justify-center">
@@ -910,6 +980,67 @@ export default function OwnerDashboardPage() {
                     </CardContent>
                 </Card>
             )}
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+            >
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Delete Guest QR Code</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <div className="text-center">
+                            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+                                <Trash2 className="h-8 w-8 text-red-600" />
+                            </div>
+                            <h3 className="text-lg font-semibold">
+                                Are you sure?
+                            </h3>
+                            <p className="text-sm text-muted-foreground mt-2">
+                                This action cannot be undone. This will
+                                permanently delete the guest QR code for{" "}
+                                <span className="font-medium text-foreground">
+                                    {qrCodeToDelete?.guestName}
+                                </span>
+                                .
+                            </p>
+                        </div>
+                        <div className="flex gap-3">
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setDeleteDialogOpen(false);
+                                    setQrCodeToDelete(null);
+                                }}
+                                className="flex-1"
+                                disabled={deletingQR}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                onClick={confirmDeleteGuestQRCode}
+                                className="flex-1"
+                                disabled={deletingQR}
+                            >
+                                {deletingQR ? (
+                                    <>
+                                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                                        Deleting...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Trash2 className="h-4 w-4 mr-2" />
+                                        Delete
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
