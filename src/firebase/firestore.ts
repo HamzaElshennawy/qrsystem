@@ -286,7 +286,9 @@ export const firestoreService = {
                 if (phone) {
                     const key = phone;
                     if (seenPhones.has(key)) {
-                        throw new Error(`Duplicate phone in CSV/import: ${phone}`);
+                        throw new Error(
+                            `Duplicate phone in CSV/import: ${phone}`
+                        );
                     }
                     seenPhones.add(key);
                 }
@@ -302,7 +304,9 @@ export const firestoreService = {
         },
 
         getByPhone: async (phone: string): Promise<User[]> => {
-            return firestoreService.query<User>("users", [where("phone", "==", phone.trim())]);
+            return firestoreService.query<User>("users", [
+                where("phone", "==", phone.trim()),
+            ]);
         },
 
         // Enhanced phone number search with multiple format matching
@@ -310,43 +314,61 @@ export const firestoreService = {
             // Normalize phone number for better matching - remove ALL non-digit characters except +
             const normalizePhone = (phone: string) => {
                 // Remove spaces, dashes, parentheses, and other formatting
-                return phone.replace(/[\s\-\(\)\.]/g, '');
+                return phone.replace(/[\s\-\(\)\.]/g, "");
             };
 
             const normalizedPhone = normalizePhone(phone);
-            console.log(`Normalizing phone: "${phone}" -> "${normalizedPhone}"`);
+            console.log(
+                `Normalizing phone: "${phone}" -> "${normalizedPhone}"`
+            );
 
             // Try multiple phone number formats
+            const withoutPlus = normalizedPhone.replace(/^\+/, "");
+            // If Egyptian number (starts with +20 or 20), include a 0-prefixed local variant (011xxxx)
+            const egyptianLocal = withoutPlus.startsWith("20")
+                ? `0${withoutPlus.replace(/^20/, "")}`
+                : null;
+
             const phoneVariations = [
                 phone, // Original format
                 normalizedPhone, // Digits only (no spaces/formatting)
-                phone.replace(/\s/g, ''), // Remove only spaces
-                phone.replace(/[\s\-]/g, ''), // Remove spaces and dashes
-                `+${normalizedPhone.replace(/^\+/, '')}`, // Ensure + prefix
-                normalizedPhone.replace(/^\+/, ''), // Remove + prefix
+                phone.replace(/\s/g, ""), // Remove only spaces
+                phone.replace(/[\s\-]/g, ""), // Remove spaces and dashes
+                `+${withoutPlus}`, // Ensure + prefix
+                withoutPlus, // Remove + prefix
+                ...(egyptianLocal ? [egyptianLocal] : []),
             ];
 
             // Remove duplicates
             const uniquePhoneVariations = [...new Set(phoneVariations)];
             console.log(`Phone variations to try:`, uniquePhoneVariations);
-            
+
             const owners: User[] = [];
 
             // Try each phone variation
             for (const phoneVariation of uniquePhoneVariations) {
                 try {
                     console.log(`Trying phone variation: "${phoneVariation}"`);
-                    const foundOwners = await firestoreService.query<User>("users", [where("phone", "==", phoneVariation)]);
-                    console.log(`Found ${foundOwners.length} owners for variation: "${phoneVariation}"`);
+                    const foundOwners = await firestoreService.query<User>(
+                        "users",
+                        [where("phone", "==", phoneVariation)]
+                    );
+                    console.log(
+                        `Found ${foundOwners.length} owners for variation: "${phoneVariation}"`
+                    );
                     owners.push(...foundOwners);
                 } catch (error) {
-                    console.log(`Error searching for phone variation ${phoneVariation}:`, error);
+                    console.log(
+                        `Error searching for phone variation ${phoneVariation}:`,
+                        error
+                    );
                 }
             }
 
             // Remove duplicates based on user ID
-            const uniqueOwners = owners.filter((owner, index, self) => 
-                index === self.findIndex(o => o.id === owner.id)
+            const uniqueOwners = owners.filter(
+                (owner, index, self) =>
+                    index === self.findIndex((o) => o.id === owner.id)
             );
 
             console.log(`Total unique owners found: ${uniqueOwners.length}`);
@@ -354,30 +376,40 @@ export const firestoreService = {
             // If no exact matches, try broader search
             if (uniqueOwners.length === 0) {
                 console.log("No exact matches found, trying broader search...");
-                const allUsers = await firestoreService.query<User>("users", []);
-                
+                const allUsers = await firestoreService.query<User>(
+                    "users",
+                    []
+                );
+
                 const similarOwners = allUsers.filter((user) => {
                     if (!user.phone) return false;
-                    
+
                     const userPhoneNormalized = normalizePhone(user.phone);
                     const currentPhoneNormalized = normalizePhone(phone);
-                    
-                    console.log(`Comparing: "${userPhoneNormalized}" vs "${currentPhoneNormalized}"`);
-                    
+
+                    console.log(
+                        `Comparing: "${userPhoneNormalized}" vs "${currentPhoneNormalized}"`
+                    );
+
                     // Check if the last 10 digits match (common for US numbers)
                     const userLast10 = userPhoneNormalized.slice(-10);
                     const currentLast10 = currentPhoneNormalized.slice(-10);
-                    
+
                     // Also try full normalized comparison
-                    const fullMatch = userPhoneNormalized === currentPhoneNormalized;
+                    const fullMatch =
+                        userPhoneNormalized === currentPhoneNormalized;
                     const last10Match = userLast10 === currentLast10;
-                    
-                    console.log(`Full match: ${fullMatch}, Last 10 match: ${last10Match}`);
-                    
+
+                    console.log(
+                        `Full match: ${fullMatch}, Last 10 match: ${last10Match}`
+                    );
+
                     return fullMatch || last10Match;
                 });
-                
-                console.log(`Found ${similarOwners.length} similar phone number matches`);
+
+                console.log(
+                    `Found ${similarOwners.length} similar phone number matches`
+                );
                 return similarOwners;
             }
 
@@ -434,7 +466,6 @@ export const firestoreService = {
         },
     },
 
-
     // Owner invite operations
     ownerInvites: {
         create: async (
@@ -471,7 +502,10 @@ export const firestoreService = {
         create: async (
             data: Omit<DeviceSession, "id" | "createdAt" | "updatedAt">
         ): Promise<string> => {
-            return firestoreService.create<DeviceSession>("deviceSessions", data);
+            return firestoreService.create<DeviceSession>(
+                "deviceSessions",
+                data
+            );
         },
 
         getByUserAndDevice: async (
@@ -489,27 +523,30 @@ export const firestoreService = {
         },
 
         getByUser: async (userId: string): Promise<DeviceSession[]> => {
-            return firestoreService.query<DeviceSession>(
-                "deviceSessions",
-                [where("userId", "==", userId)]
-            );
+            return firestoreService.query<DeviceSession>("deviceSessions", [
+                where("userId", "==", userId),
+            ]);
         },
 
-        updateLastUsed: async (
-            id: string
-        ): Promise<void> => {
+        updateLastUsed: async (id: string): Promise<void> => {
             await firestoreService.update<DeviceSession>("deviceSessions", id, {
                 lastUsedAt: Timestamp.now(),
             });
         },
 
         deactivateAll: async (userId: string): Promise<void> => {
-            const sessions = await firestoreService.deviceSessions.getByUser(userId);
+            const sessions = await firestoreService.deviceSessions.getByUser(
+                userId
+            );
             for (const session of sessions) {
                 if (session.id) {
-                    await firestoreService.update<DeviceSession>("deviceSessions", session.id, {
-                        isActive: false,
-                    });
+                    await firestoreService.update<DeviceSession>(
+                        "deviceSessions",
+                        session.id,
+                        {
+                            isActive: false,
+                        }
+                    );
                 }
             }
         },
